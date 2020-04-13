@@ -7,7 +7,7 @@ Project("{11A8DD76-328B-46DF-9F39-F559912D0360}") = "00.ShieldSPI", "ShieldSPI\0
 EndProject
 Project("{11A8DD76-328B-46DF-9F39-F559912D0360}") = "01.RegisterScan", "RegisterScan\01.RegisterScan.nfproj", "{86B5811D-1FBE-4395-A462-8A9B6587D4E5}"
 EndProject
-Project("{11A8DD76-328B-46DF-9F39-F559912D0360}") = "RegisterReadAndWrite", "RegisterReadAndWrite\RegisterReadAndWrite.nfproj", "{62A21EEE-92A7-4A91-9E49-C83460228C57}"
+Project("{11A8DD76-328B-46DF-9F39-F559912D0360}") = "02.RegisterReadAndWrite", "RegisterReadAndWrite\02.RegisterReadAndWrite.nfproj", "{62A21EEE-92A7-4A91-9E49-C83460228C57}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
