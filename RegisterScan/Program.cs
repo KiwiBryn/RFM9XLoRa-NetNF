@@ -46,12 +46,12 @@ namespace devMobile.IoT.Rfm9x.RegisterScan
 
       public Byte RegisterReadByte(byte registerAddress)
       {
-         byte[] writeBuffer = new byte[] { registerAddress };
-         byte[] readBuffer = new byte[1];
+         byte[] writeBuffer = new byte[] { registerAddress, 0x0 };
+         byte[] readBuffer = new byte[writeBuffer.Length];
 
-         rfm9XLoraModem.TransferSequential(writeBuffer, readBuffer);
+         rfm9XLoraModem.TransferFullDuplex(writeBuffer, readBuffer);
 
-         return readBuffer[0];
+         return readBuffer[1];
       }
    }
 
