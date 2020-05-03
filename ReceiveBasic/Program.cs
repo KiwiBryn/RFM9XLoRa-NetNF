@@ -12,8 +12,10 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// nanoff --target ST_STM32F429I_DISCOVERY --update
+// 
 //---------------------------------------------------------------------------------
+//#define ST_STM32F429I_DISCOVERY       //nanoff --target ST_STM32F429I_DISCOVERY --update
+#define ESP32_WROOM_32_LORA_1_CHANNEL   //nanoff --target ESP32_WROOM_32 --serialport COM4 --update
 namespace devMobile.IoT.Rfm9x.ReceiveBasic
 {
    using System;
@@ -23,10 +25,13 @@ namespace devMobile.IoT.Rfm9x.ReceiveBasic
    using Windows.Devices.Gpio;
    using Windows.Devices.Spi;
 
+#if ESP32_WROOM_32_LORA_1_CHANNEL
+   using nanoFramework.Hardware.Esp32;
+#endif
+
    public sealed class Rfm9XDevice
    {
       private SpiDevice rfm9XLoraModem;
-      private GpioPin chipSelectGpioPin;
       private const byte RegisterAddressReadMask = 0X7f;
       private const byte RegisterAddressWriteMask = 0x80;
 
@@ -35,26 +40,33 @@ namespace devMobile.IoT.Rfm9x.ReceiveBasic
          var settings = new SpiConnectionSettings(chipSelectPin)
          {
             ClockFrequency = 500000,
-            //            DataBitLength = 8,
+            //DataBitLength = 8,
             Mode = SpiMode.Mode0,// From SemTech docs pg 80 CPOL=0, CPHA=0
             SharingMode = SpiSharingMode.Shared,
          };
 
          rfm9XLoraModem = SpiDevice.FromId(spiPort, settings);
 
-         GpioController gpioController = GpioController.GetDefault();
-
-         // Chip select pin configuration
-         chipSelectGpioPin = gpioController.OpenPin(chipSelectPin);
-         chipSelectGpioPin.SetDriveMode(GpioPinDriveMode.Output);
-
          // Factory reset pin configuration
+         GpioController gpioController = GpioController.GetDefault();
          GpioPin resetGpioPin = gpioController.OpenPin(resetPin);
          resetGpioPin.SetDriveMode(GpioPinDriveMode.Output);
          resetGpioPin.Write(GpioPinValue.Low);
          Thread.Sleep(10);
          resetGpioPin.Write(GpioPinValue.High);
          Thread.Sleep(10);
+      }
+
+      public Rfm9XDevice(string spiPort, int chipSelectPin)
+      {
+         var settings = new SpiConnectionSettings(chipSelectPin)
+         {
+            ClockFrequency = 500000,
+            Mode = SpiMode.Mode0,// From SemTech docs pg 80 CPOL=0, CPHA=0
+            SharingMode = SpiSharingMode.Shared,
+         };
+
+         rfm9XLoraModem = SpiDevice.FromId(spiPort, settings);
       }
 
       public Byte RegisterReadByte(byte registerAddress)
@@ -80,41 +92,44 @@ namespace devMobile.IoT.Rfm9x.ReceiveBasic
       public byte[] RegisterRead(byte address, int length)
       {
          byte[] writeBuffer = new byte[length + 1];
-         byte[] readBuffer = new byte[length + 1];
-         byte[] repyBuffer = new byte[length];
+         byte[] readBuffer = new byte[writeBuffer.Length];
+         byte[] replyBuffer = new byte[length];
 
          writeBuffer[0] = address &= RegisterAddressReadMask;
 
          rfm9XLoraModem.TransferFullDuplex(writeBuffer, readBuffer);
 
-         Array.Copy(readBuffer, 1, repyBuffer, 0, length);
+         Array.Copy(readBuffer, 1, replyBuffer, 0, length);
 
-         return repyBuffer;
+         return replyBuffer;
       }
 
       public void RegisterWriteByte(byte address, byte value)
       {
          byte[] writeBuffer = new byte[] { address |= RegisterAddressWriteMask, value };
+         byte[] readBuffer = new byte[writeBuffer.Length];
 
-         rfm9XLoraModem.Write(writeBuffer);
+         rfm9XLoraModem.TransferFullDuplex(writeBuffer, readBuffer);
       }
 
       public void RegisterWriteWord(byte address, ushort value)
       {
          byte[] valueBytes = BitConverter.GetBytes(value);
          byte[] writeBuffer = new byte[] { address |= RegisterAddressWriteMask, valueBytes[0], valueBytes[1] };
+         byte[] readBuffer = new byte[writeBuffer.Length];
 
-         rfm9XLoraModem.Write(writeBuffer);
+         rfm9XLoraModem.TransferFullDuplex(writeBuffer, readBuffer);
       }
 
       public void RegisterWrite(byte address, byte[] bytes)
       {
          byte[] writeBuffer = new byte[1 + bytes.Length];
+         byte[] readBuffer = new byte[writeBuffer.Length];
 
          Array.Copy(bytes, 0, writeBuffer, 1, bytes.Length);
          writeBuffer[0] = address |= RegisterAddressWriteMask;
 
-         rfm9XLoraModem.Write(writeBuffer);
+         rfm9XLoraModem.TransferFullDuplex(writeBuffer, readBuffer);
       }
 
       public void RegisterDump()
@@ -131,54 +146,93 @@ namespace devMobile.IoT.Rfm9x.ReceiveBasic
 
    class Program
    {
+#if ST_STM32F429I_DISCOVERY
+      private const string SpiBusId = "SPI5";
+#endif
+#if ESP32_WROOM_32_LORA_1_CHANNEL
+      private const string SpiBusId = "SPI1";
+#endif
+
       static void Main()
       {
-         Rfm9XDevice rfm9XDevice = new Rfm9XDevice("SPI5", PinNumber('C', 2), PinNumber('C', 3));
-         int SendCount = 0;
+#if ST_STM32F429I_DISCOVERY
+         int chipSelectPinNumber = PinNumber('C', 2);
+         int resetPinNumber = PinNumber('C', 3);
+#endif
+#if ESP32_WROOM_32_LORA_1_CHANNEL
+         int chipSelectPinNumber = Gpio.IO16;
+#endif
 
-         // Put device into LoRa + Sleep mode
-         // Put device into LoRa + Sleep mode
-         rfm9XDevice.RegisterWriteByte(0x01, 0b10000000); // RegOpMode 
-
-         // Set the frequency to 915MHz
-         byte[] frequencyWriteBytes = { 0xE4, 0xC0, 0x00 }; // RegFrMsb, RegFrMid, RegFrLsb
-         rfm9XDevice.RegisterWrite(0x06, frequencyWriteBytes);
-
-         rfm9XDevice.RegisterWriteByte(0x0F, 0x0); // RegFifoRxBaseAddress 
-
-         rfm9XDevice.RegisterWriteByte(0x01, 0b10000101); // RegOpMode set LoRa & RxContinuous
-
-         while (true)
+         try
          {
-            // Wait until a packet is received, no timeouts in PoC
-            Console.WriteLine("Receive-Wait");
-            byte irqFlags = rfm9XDevice.RegisterReadByte(0x12); // RegIrqFlags
-            while ((irqFlags & 0b01000000) == 0)  // wait until RxDone cleared
+#if ESP32_WROOM_32_LORA_1_CHANNEL
+            Configuration.SetPinFunction(Gpio.IO12, DeviceFunction.SPI1_MISO);
+            Configuration.SetPinFunction(Gpio.IO13, DeviceFunction.SPI1_MOSI);
+            Configuration.SetPinFunction(Gpio.IO14, DeviceFunction.SPI1_CLOCK);
+            Rfm9XDevice rfm9XDevice = new Rfm9XDevice(SpiBusId, chipSelectPinNumber);
+#endif
+#if ST_STM32F429I_DISCOVERY
+            Rfm9XDevice rfm9XDevice = new Rfm9XDevice(SpiBusId, chipSelectPinNumber, resetPinNumber);
+#endif
+             Thread.Sleep(500);
+
+            // Put device into LoRa + Sleep mode
+            rfm9XDevice.RegisterWriteByte(0x01, 0b10000000); // RegOpMode 
+
+            // Set the frequency to 915MHz
+            byte[] frequencyWriteBytes = { 0xE4, 0xC0, 0x00 }; // RegFrMsb, RegFrMid, RegFrLsb
+            rfm9XDevice.RegisterWrite(0x06, frequencyWriteBytes);
+
+            rfm9XDevice.RegisterWriteByte(0x0F, 0x0); // RegFifoRxBaseAddress 
+
+            rfm9XDevice.RegisterWriteByte(0x01, 0b10000101); // RegOpMode set LoRa & RxContinuous
+
+            while (true)
             {
-               Thread.Sleep(100);
-               irqFlags = rfm9XDevice.RegisterReadByte(0x12); // RegIrqFlags
-               //Debug.Write(".");
+               // Wait until a packet is received, no timeouts in PoC
+               Console.WriteLine("Receive-Wait");
+               byte irqFlags = rfm9XDevice.RegisterReadByte(0x12); // RegIrqFlags
+               while ((irqFlags & 0b01000000) == 0)  // wait until RxDone cleared
+               {
+                  Thread.Sleep(100);
+                  irqFlags = rfm9XDevice.RegisterReadByte(0x12); // RegIrqFlags
+                  Console.Write(".");
+               }
+               Console.WriteLine("");
+               Console.WriteLine($"RegIrqFlags 0X{irqFlags:X2}");
+               Console.WriteLine("Receive-Message");
+               byte currentFifoAddress = rfm9XDevice.RegisterReadByte(0x10); // RegFifiRxCurrent
+               rfm9XDevice.RegisterWriteByte(0x0d, currentFifoAddress); // RegFifoAddrPtr
+
+               byte numberOfBytes = rfm9XDevice.RegisterReadByte(0x13); // RegRxNbBytes
+
+               byte[] messageBytes = rfm9XDevice.RegisterRead(0x00, numberOfBytes); // RegFifo
+
+               rfm9XDevice.RegisterWriteByte(0x0d, 0);
+               rfm9XDevice.RegisterWriteByte(0x12, 0b11111111); // RegIrqFlags clear all the bits
+
+               // Remove unprintable characters from messages
+               for( int index = 0; index < messageBytes.Length; index++)
+               {
+                  if ((messageBytes[index] < 0x20) || (messageBytes[index] > 0x7E))
+                  {
+                     messageBytes[index] = 0x20;
+                  }
+               }
+
+               string messageText = UTF8Encoding.UTF8.GetString(messageBytes, 0, messageBytes.Length);
+               Console.WriteLine($"Received {messageBytes.Length} byte message {messageText}");
+
+               Console.WriteLine("Receive-Done");
             }
-            Console.WriteLine("");
-            Console.WriteLine($"RegIrqFlags 0X{irqFlags:X2}");
-            Console.WriteLine("Receive-Message");
-            byte currentFifoAddress = rfm9XDevice.RegisterReadByte(0x10); // RegFifiRxCurrent
-            rfm9XDevice.RegisterWriteByte(0x0d, currentFifoAddress); // RegFifoAddrPtr
-
-            byte numberOfBytes = rfm9XDevice.RegisterReadByte(0x13); // RegRxNbBytes
-
-            byte[] messageBytes = rfm9XDevice.RegisterRead(0x00, numberOfBytes); // RegFifo
-
-            rfm9XDevice.RegisterWriteByte(0x0d, 0);
-            rfm9XDevice.RegisterWriteByte(0x12, 0b11111111); // RegIrqFlags clear all the bits
-
-            string messageText = UTF8Encoding.UTF8.GetString(messageBytes,0, messageBytes.Length);
-            Console.WriteLine($"Received {messageBytes.Length} byte message {messageText}");
-
-            Console.WriteLine("Receive-Done");
+         }
+         catch (Exception ex)
+         {
+            Console.WriteLine(ex.Message);
          }
       }
 
+#if ST_STM32F429I_DISCOVERY
       static int PinNumber(char port, byte pin)
       {
          if (port < 'A' || port > 'J')
@@ -186,6 +240,7 @@ namespace devMobile.IoT.Rfm9x.ReceiveBasic
 
          return ((port - 'A') * 16) + pin;
       }
+#endif
    }
 }
 
