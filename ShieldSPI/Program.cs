@@ -14,8 +14,8 @@
 // limitations under the License.
 //
 //---------------------------------------------------------------------------------
-//#define ST_STM32F429I_DISCOVERY       //nanoff --target ST_STM32F429I_DISCOVERY --update
-#define ESP32_WROOM_32_LORA_1_CHANNEL   //nanoff --target ESP32_WROOM_32 --serialport COM4 --update
+#define ST_STM32F429I_DISCOVERY       //nanoff --target ST_STM32F429I_DISCOVERY --update
+//#define ESP32_WROOM_32_LORA_1_CHANNEL   //nanoff --target ESP32_WROOM_32 --serialport COM4 --update
 namespace devMobile.IoT.Rfm9x.ShieldSPI
 {
    using System;
@@ -74,13 +74,12 @@ namespace devMobile.IoT.Rfm9x.ShieldSPI
 
                while (true)
                {
-                  byte[] writeBuffer = new byte[] { RegVersion };
+                  byte[] writeBuffer = new byte[] { RegVersion, 0x0 };
                   byte[] readBuffer = new byte[writeBuffer.Length];
 
-                  device.TransferSequential(writeBuffer, readBuffer); // STM32_F429_DISCO worked, ESP32_LORA_1_CHANNEL worked
-                  //device.TransferFullDuplex(writeBuffer, readBuffer); // STM32_F429_DISCO didn't work, ESP32_LORA_1_CHANNEL didn't work
+                  device.TransferFullDuplex(writeBuffer, readBuffer); 
 
-                  Console.WriteLine(String.Format("Register 0x{0:x2} - Value 0X{1:x2}", RegVersion, readBuffer[0]));
+                  Console.WriteLine(String.Format("Register 0x{0:x2} - Value 0X{1:x2}", RegVersion, readBuffer[1]));
 
                   led.Toggle();
                   Thread.Sleep(10000);
