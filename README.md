@@ -22,5 +22,8 @@ My initial test rig consisted of
 * [STM32F429 Discovery](https://www.st.com/en/evaluation-tools/32f429idiscovery.html) from [ST Micro electronics](https://www.st.com)
 * [Dragino Shield](http://www.dragino.com/products/lora/item/102-lora-shield.html) from [Dragino Technology](http://www.dragino.com)
 * [Armronix IA005: SX1276 Lora node](https://www.tindie.com/products/Armtronix/ia005-sx1276-lora-node-stm32f103-pair-2nos/) from Armtronix
-
 ![LoRa Shield for Arduino](Disco429WithArmtronix.jpg)
+
+My second test rig was
+* [LoRa Gateway - 1-Channel (ESP32)](https://www.sparkfun.com/products/15006)
+![ESP32 WROON SIngle Chanel Gateway](NetNFESP32.jpg)
