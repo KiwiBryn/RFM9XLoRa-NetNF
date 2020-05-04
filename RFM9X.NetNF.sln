@@ -9,7 +9,7 @@ Project("{11A8DD76-328B-46DF-9F39-F559912D0360}") = "01.RegisterScan", "Register
 EndProject
 Project("{11A8DD76-328B-46DF-9F39-F559912D0360}") = "02.RegisterReadAndWrite", "RegisterReadAndWrite\02.RegisterReadAndWrite.nfproj", "{62A21EEE-92A7-4A91-9E49-C83460228C57}"
 EndProject
-Project("{11A8DD76-328B-46DF-9F39-F559912D0360}") = "TransmitBasic", "TransmitBasic\TransmitBasic.nfproj", "{F809A776-0857-4324-9333-33435CFA743C}"
+Project("{11A8DD76-328B-46DF-9F39-F559912D0360}") = "03.TransmitBasic", "TransmitBasic\03.TransmitBasic.nfproj", "{F809A776-0857-4324-9333-33435CFA743C}"
 EndProject
 Project("{11A8DD76-328B-46DF-9F39-F559912D0360}") = "ReceiveBasic", "ReceiveBasic\ReceiveBasic.nfproj", "{C03254B0-C44C-4BC2-B711-9F0E53879198}"
 EndProject
