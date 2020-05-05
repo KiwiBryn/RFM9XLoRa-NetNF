@@ -210,8 +210,8 @@ namespace devMobile.IoT.Rfm9x.TransmitInterrupt
 #endif
             Thread.Sleep(500);
 
-            // Put device into LoRa + Sleep mode
-            rfm9XDevice.RegisterWriteByte(0x01, 0b10000000); // RegOpMode 
+            // Put device into LoRa + Standby mode
+            rfm9XDevice.RegisterWriteByte(0x01, 0b10000001); // RegOpMode 
 
             // Set the frequency to 915MHz
             byte[] frequencyWriteBytes = { 0xE4, 0xC0, 0x00 }; // RegFrMsb, RegFrMid, RegFrLsb
