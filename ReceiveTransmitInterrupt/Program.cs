@@ -217,6 +217,7 @@ namespace devMobile.IoT.Rfm9x.ReceiveTransmitInterrupt
 #if ST_STM32F429I_DISCOVERY
          int chipSelectPinNumber = PinNumber('C', 2);
          int resetPinNumber = PinNumber('C', 3);
+         int interruptPinNumber = PinNumber('A', 4);
 #endif
 #if ESP32_WROOM_32_LORA_1_CHANNEL
          int chipSelectPinNumber = Gpio.IO16;
@@ -232,7 +233,7 @@ namespace devMobile.IoT.Rfm9x.ReceiveTransmitInterrupt
             Rfm9XDevice rfm9XDevice = new Rfm9XDevice(SpiBusId, chipSelectPinNumber, interruptPinNumber);
 #endif
 #if ST_STM32F429I_DISCOVERY
-            Rfm9XDevice rfm9XDevice = new Rfm9XDevice(SpiBusId, chipSelectPinNumber, resetPinNumber, );
+            Rfm9XDevice rfm9XDevice = new Rfm9XDevice(SpiBusId, chipSelectPinNumber, resetPinNumber, interruptPinNumber);
 #endif
             Thread.Sleep(500);
 
