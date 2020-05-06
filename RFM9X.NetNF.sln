@@ -15,7 +15,9 @@ Project("{11A8DD76-328B-46DF-9F39-F559912D0360}") = "04.ReceiveBasic", "ReceiveB
 EndProject
 Project("{11A8DD76-328B-46DF-9F39-F559912D0360}") = "05.ReceiveInterrupt", "ReceiveInterrupt\05.ReceiveInterrupt.nfproj", "{98955B89-8C11-401B-A11B-2BC0CCE4E21F}"
 EndProject
-Project("{11A8DD76-328B-46DF-9F39-F559912D0360}") = "TransmitInterrupt", "TransmitInterrupt\TransmitInterrupt.nfproj", "{F57B9E0E-D3AC-447E-B6C5-9376FC06AFD3}"
+Project("{11A8DD76-328B-46DF-9F39-F559912D0360}") = "06.TransmitInterrupt", "TransmitInterrupt\06.TransmitInterrupt.nfproj", "{F57B9E0E-D3AC-447E-B6C5-9376FC06AFD3}"
+EndProject
+Project("{11A8DD76-328B-46DF-9F39-F559912D0360}") = "07.ReceiveTransmitInterrupt", "ReceiveTransmitInterrupt\07.ReceiveTransmitInterrupt.nfproj", "{3C754D85-1B6D-4D7B-8D4D-06AB88A892EE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -65,6 +67,12 @@ Global
 		{F57B9E0E-D3AC-447E-B6C5-9376FC06AFD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F57B9E0E-D3AC-447E-B6C5-9376FC06AFD3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F57B9E0E-D3AC-447E-B6C5-9376FC06AFD3}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{3C754D85-1B6D-4D7B-8D4D-06AB88A892EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C754D85-1B6D-4D7B-8D4D-06AB88A892EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C754D85-1B6D-4D7B-8D4D-06AB88A892EE}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{3C754D85-1B6D-4D7B-8D4D-06AB88A892EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C754D85-1B6D-4D7B-8D4D-06AB88A892EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C754D85-1B6D-4D7B-8D4D-06AB88A892EE}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
