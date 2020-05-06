@@ -14,8 +14,8 @@
 // limitations under the License.
 // 
 //---------------------------------------------------------------------------------
-//#define ST_STM32F429I_DISCOVERY       //nanoff --target ST_STM32F429I_DISCOVERY --update
-#define ESP32_WROOM_32_LORA_1_CHANNEL   //nanoff --target ESP32_WROOM_32 --serialport COM4 --update
+#define ST_STM32F429I_DISCOVERY       //nanoff --target ST_STM32F429I_DISCOVERY --update
+//#define ESP32_WROOM_32_LORA_1_CHANNEL   //nanoff --target ESP32_WROOM_32 --serialport COM4 --update
 namespace devMobile.IoT.Rfm9x.TransmitInterrupt
 {
    using System;
@@ -59,7 +59,7 @@ namespace devMobile.IoT.Rfm9x.TransmitInterrupt
 
          // Interrupt pin for RX message & TX done notification 
          InterruptGpioPin = gpioController.OpenPin(interruptPin);
-         resetGpioPin.SetDriveMode(GpioPinDriveMode.Input);
+         InterruptGpioPin.SetDriveMode(GpioPinDriveMode.Input);
 
          InterruptGpioPin.ValueChanged += InterruptGpioPin_ValueChanged;
       }
@@ -98,7 +98,7 @@ namespace devMobile.IoT.Rfm9x.TransmitInterrupt
             Console.WriteLine("Transmit-Done");
          }
 
-         this.RegisterWriteByte(0x12, 0xff);// RegIrqFlags      }
+         this.RegisterWriteByte(0x12, 0xff);// RegIrqFlags      
       }
 
       public Byte RegisterReadByte(byte registerAddress)
@@ -191,6 +191,7 @@ namespace devMobile.IoT.Rfm9x.TransmitInterrupt
 #if ST_STM32F429I_DISCOVERY
          int chipSelectPinNumber = PinNumber('C', 2);
          int resetPinNumber = PinNumber('C', 3);
+         int interruptPinNumber = PinNumber('A', 4);
 #endif
 #if ESP32_WROOM_32_LORA_1_CHANNEL
          int chipSelectPinNumber = Gpio.IO16;
@@ -206,12 +207,12 @@ namespace devMobile.IoT.Rfm9x.TransmitInterrupt
             Rfm9XDevice rfm9XDevice = new Rfm9XDevice(SpiBusId, chipSelectPinNumber, interruptPinNumber);
 #endif
 #if ST_STM32F429I_DISCOVERY
-            Rfm9XDevice rfm9XDevice = new Rfm9XDevice(SpiBusId, chipSelectPinNumber, resetPinNumber, );
+            Rfm9XDevice rfm9XDevice = new Rfm9XDevice(SpiBusId, chipSelectPinNumber, resetPinNumber, interruptPinNumber);
 #endif
             Thread.Sleep(500);
 
             // Put device into LoRa + Standby mode
-            rfm9XDevice.RegisterWriteByte(0x01, 0b10000001); // RegOpMode 
+            rfm9XDevice.RegisterWriteByte(0x01, 0b10000000); // RegOpMode 
 
             // Set the frequency to 915MHz
             byte[] frequencyWriteBytes = { 0xE4, 0xC0, 0x00 }; // RegFrMsb, RegFrMid, RegFrLsb
