@@ -66,7 +66,7 @@ namespace devMobile.IoT.Rfm9x.LoRaDeviceClient
 #if ST_STM32F429I_DISCOVERY
 			Rfm9XDevice rfm9XDevice = new Rfm9XDevice(SpiBusId, chipSelectPinNumber, resetPinNumber, interruptPinNumber);
 #endif
-			rfm9XDevice.Initialise(Frequency, paBoost: true, rxPayloadCrcOn: true);
+			rfm9XDevice.Initialise(Frequency, paBoost: true);
 
 #if DEBUG
 			rfm9XDevice.RegisterDump();
