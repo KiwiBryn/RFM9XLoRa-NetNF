@@ -10,14 +10,14 @@ The repo has the source code for the series of blog posts written as I built thi
 05. ReceiveBasic(https://blog.devmobile.co.nz/2020/05/05/nanoframework-lora-library-part5/)
 06. ReceiveTransmitInterrupt(https://blog.devmobile.co.nz/2020/05/06/nanoframwork-lora-library-part6/)
 
-Currently (May2020) the Chibios(http://chibios.org/dokuwiki/doku.php) SPI library appears to be having some issues writing to the transmit FIFO.
+Currently (May2020) the Chibios(http://chibios.org/dokuwiki/doku.php) SPI library appears to be having some issues writing to the transmit FIFO. There is an additional unprintable byte at the start of the messages and the last byte is truncated.
 
-20:56:48.545 -> Message: ⸮Hello from LoRaIoT1 ! 17
-20:56:48.578 -> Length: 25
-20:56:48.578 -> FirstChar: 143
-20:56:48.611 -> RSSI: -37
-20:56:48.611 -> Snr: 9.75
-20:56:48.611 -> 
+20:56:48.545 -> Message: ⸮Hello from LoRaIoT1 ! 17<br>
+20:56:48.578 -> Length: 25<br>
+20:56:48.578 -> FirstChar: 143<br>
+20:56:48.611 -> RSSI: -37<br>
+20:56:48.611 -> Snr: 9.75<br>
+20:56:48.611 -><br>
 
 Fully featured driver and sample application
 Rfm9xLoRaDeviceClient 
