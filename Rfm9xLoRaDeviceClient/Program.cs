@@ -31,23 +31,22 @@ namespace devMobile.IoT.Rfm9x.LoRaDeviceClient
 
 	class Program
 	{
-		const double Frequency = 915000000.0;
+		private const double Frequency = 915000000.0;
 #if ST_STM32F429I_DISCOVERY
+		private const string DeviceName = "Disco429";
 		private const string SpiBusId = "SPI5";
 #endif
 #if ESP32_WROOM_32_LORA_1_CHANNEL
+		private const string DeviceName = "ESP32";
 		private const string SpiBusId = "SPI1";
+#endif
+#if ADDRESSED_MESSAGES_PAYLOAD
+		private const string DeviceName = "LoRaIoT1";
 #endif
 
 		static void Main()
 		{
 			byte MessageCount = System.Byte.MaxValue;
-#if ADDRESSED_MESSAGES_PAYLOAD
-			const string HostName = "ESP32LoRa";
-			const string DeviceName = "LoRaIoT1";
-#else
-			const string DeviceName = "ESP32LoRa";
-#endif
 #if ST_STM32F429I_DISCOVERY
 			int chipSelectPinNumber = PinNumber('C', 2);
 			int resetPinNumber = PinNumber('C', 3);
