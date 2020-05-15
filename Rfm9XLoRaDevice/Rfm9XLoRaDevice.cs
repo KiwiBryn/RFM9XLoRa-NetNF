@@ -23,9 +23,6 @@ namespace devMobile.IoT.Rfm9x
 	using Windows.Devices.Gpio;
 
 	using nanoFramework.Runtime.Events;
-#if ESP32_WROOM_32_LORA_1_CHANNEL
-   using nanoFramework.Hardware.Esp32;
-#endif
 
 	public sealed class Rfm9XDevice
 	{

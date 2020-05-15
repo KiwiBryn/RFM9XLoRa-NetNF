@@ -21,10 +21,6 @@ namespace devMobile.IoT.Rfm9x
 	using Windows.Devices.Gpio;
 	using Windows.Devices.Spi;
 
-#if ESP32_WROOM_32_LORA_1_CHANNEL
-   using nanoFramework.Hardware.Esp32;
-#endif
-
 	public sealed class RegisterManager
 	{
 		private SpiDevice rfm9XLoraModem;
@@ -33,8 +29,6 @@ namespace devMobile.IoT.Rfm9x
 
 		public RegisterManager(string spiPortName, int chipSelectPin, int clockFrequency = 500000)
 		{
-			GpioPin chipSelectGpio = GpioController.GetDefault().OpenPin(chipSelectPin);
-
 			var settings = new SpiConnectionSettings(chipSelectPin)
 			{
 				Mode = SpiMode.Mode0,
