@@ -80,9 +80,10 @@ namespace devMobile.IoT.Rfm9x
 		public void WriteByte(byte address, byte value)
 		{
 			byte[] writeBuffer = new byte[] { address |= RegisterAddressWriteMask, value };
+			byte[] readBuffer = new byte[writeBuffer.Length];
 			//Debug.Assert(rfm9XLoraModem != null);
 
-			rfm9XLoraModem.Write(writeBuffer);
+			rfm9XLoraModem.TransferFullDuplex(writeBuffer, readBuffer);
 		}
 
 		public void WriteWord(byte address, ushort value)
@@ -97,12 +98,13 @@ namespace devMobile.IoT.Rfm9x
 		public void Write(byte address, byte[] bytes)
 		{
 			byte[] writeBuffer = new byte[1 + bytes.Length];
+			byte[] readBuffer = new byte[writeBuffer.Length];
 			//Debug.Assert(rfm9XLoraModem != null);
 
 			Array.Copy(bytes, 0, writeBuffer, 1, bytes.Length);
 			writeBuffer[0] = address |= RegisterAddressWriteMask;
 
-			rfm9XLoraModem.Write(writeBuffer);
+			rfm9XLoraModem.TransferFullDuplex(writeBuffer, readBuffer);
 		}
 
 		public void Dump(byte start, byte finish)
