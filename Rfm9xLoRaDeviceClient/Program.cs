@@ -26,6 +26,7 @@ namespace devMobile.IoT.Rfm9x.LoRaDeviceClient
 #if ESP32_WROOM_32_LORA_1_CHANNEL
 	using nanoFramework.Hardware.Esp32;
 #endif
+	using nanoFramework.Runtime.Native;
 
 	using devMobile.IoT.Rfm9x;
 
@@ -87,7 +88,7 @@ namespace devMobile.IoT.Rfm9x.LoRaDeviceClient
 				MessageCount -= 1;
 
 				byte[] messageBytes = UTF8Encoding.UTF8.GetBytes(messageText);
-				Console.WriteLine(string.Format("{0}-TX {1} byte message {2}", DateTime.UtcNow.ToString("HH:mm:ss"), messageBytes.Length, messageText));
+				Debug.WriteLine(string.Format("{0}-TX {1} byte message {2}", DateTime.UtcNow.ToString("HH:mm:ss"), messageBytes.Length, messageText));
 #if ADDRESSED_MESSAGES_PAYLOAD
 				rfm9XDevice.Send(UTF8Encoding.UTF8.GetBytes(HostName), messageBytes);
 #else
@@ -115,20 +116,20 @@ namespace devMobile.IoT.Rfm9x.LoRaDeviceClient
 #if ADDRESSED_MESSAGES_PAYLOAD
 				string addressText = UTF8Encoding.UTF8.GetString(e.Address, 0, e.Address.Length);
 
-				Console.WriteLine(string.Format(@"{0}-RX From {1} PacketSnr {2} Packet RSSI {3}dBm RSSI {4}dBm ={5} ""{6}""", DateTime.UtcNow.ToString("HH:mm:ss"), addressText, e.PacketSnr, e.PacketRssi, e.Rssi, e.Data.Length, messageText));
+				Debug.WriteLine(string.Format(@"{0}-RX From {1} PacketSnr {2} Packet RSSI {3}dBm RSSI {4}dBm ={5} ""{6}""", DateTime.UtcNow.ToString("HH:mm:ss"), addressText, e.PacketSnr, e.PacketRssi, e.Rssi, e.Data.Length, messageText));
 #else
-				Console.WriteLine(string.Format(@"{0}-RX PacketSnr {1} Packet RSSI {2}dBm RSSI {3}dBm ={4} ""{5}""", DateTime.UtcNow.ToString("HH:mm:ss"), e.PacketSnr, e.PacketRssi, e.Rssi, e.Data.Length, messageText));
+				Debug.WriteLine(string.Format(@"{0}-RX PacketSnr {1} Packet RSSI {2}dBm RSSI {3}dBm ={4} ""{5}""", DateTime.UtcNow.ToString("HH:mm:ss"), e.PacketSnr, e.PacketRssi, e.Rssi, e.Data.Length, messageText));
 #endif
 			}
 			catch (Exception ex)
 			{
-				Console.WriteLine(ex.Message);
+				Debug.WriteLine(ex.Message);
 			}
 		}
 
 		private static void Rfm9XDevice_OnTransmit(object sender, Rfm9XDevice.OnDataTransmitedEventArgs e)
 		{
-			Console.WriteLine( string.Format("{0}-TX Done", DateTime.UtcNow.ToString("HH:mm:ss")));
+			Debug.WriteLine(string.Format("{0}-TX Done", DateTime.UtcNow.ToString("HH:mm:ss")));
 		}
 
 #if ST_STM32F429I_DISCOVERY
