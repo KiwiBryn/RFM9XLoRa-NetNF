@@ -28,6 +28,7 @@ namespace devMobile.IoT.Rfm9x.ReceiveTransmitInterrupt
 #if ESP32_WROOM_32_LORA_1_CHANNEL
    using nanoFramework.Hardware.Esp32;
 #endif
+   using nanoFramework.Runtime.Native;
 
    public sealed class Rfm9XDevice
    {
@@ -91,11 +92,11 @@ namespace devMobile.IoT.Rfm9x.ReceiveTransmitInterrupt
          }
 
          byte irqFlags = this.RegisterReadByte(0x12); // RegIrqFlags
-         Console.WriteLine($"RegIrqFlags 0X{irqFlags:x2}");
+         Debug.WriteLine($"RegIrqFlags 0X{irqFlags:x2}");
 
          if ((irqFlags & 0b01000000) == 0b01000000)  // RxDone 
          {
-            Console.WriteLine("Receive-Message");
+            Debug.WriteLine("Receive-Message");
             byte currentFifoAddress = this.RegisterReadByte(0x10); // RegFifiRxCurrent
             this.RegisterWriteByte(0x0d, currentFifoAddress); // RegFifoAddrPtr
 
@@ -114,13 +115,13 @@ namespace devMobile.IoT.Rfm9x.ReceiveTransmitInterrupt
             }
 
             string messageText = UTF8Encoding.UTF8.GetString(messageBytes,0, messageBytes.Length);
-            Console.WriteLine($"Received {messageBytes.Length} byte message {messageText}");
+            Debug.WriteLine($"Received {messageBytes.Length} byte message {messageText}");
          }
 
          if ((irqFlags & 0b00001000) == 0b00001000)  // TxDone
          {
             this.RegisterWriteByte(0x01, 0b10000101); // RegOpMode set LoRa & RxContinuous
-            Console.WriteLine("Transmit-Done");
+            Debug.WriteLine("Transmit-Done");
          }
 
          this.RegisterWriteByte(0x40, 0b00000000); // RegDioMapping1 0b00000000 DI0 RxReady & TxReady
@@ -192,12 +193,12 @@ namespace devMobile.IoT.Rfm9x.ReceiveTransmitInterrupt
 
       public void RegisterDump()
       {
-         Console.WriteLine("Register dump");
+         Debug.WriteLine("Register dump");
          for (byte registerIndex = 0; registerIndex <= 0x42; registerIndex++)
          {
             byte registerValue = this.RegisterReadByte(registerIndex);
 
-            Console.WriteLine($"Register 0x{registerIndex:x2} - Value 0X{registerValue:x2}");
+            Debug.WriteLine($"Register 0x{registerIndex:x2} - Value 0X{registerValue:x2}");
          }
       }
    }
@@ -268,14 +269,14 @@ namespace devMobile.IoT.Rfm9x.ReceiveTransmitInterrupt
                rfm9XDevice.RegisterWriteByte(0x40, 0b01000000); // RegDioMapping1 0b00000000 DI0 RxReady & TxReady
                rfm9XDevice.RegisterWriteByte(0x01, 0b10000011); // RegOpMode 
 
-               Console.WriteLine($"Sending {messageBytes.Length} bytes message {messageText}");
+               Debug.WriteLine($"Sending {messageBytes.Length} bytes message {messageText}");
 
                Thread.Sleep(10000);
             }
          }
          catch (Exception ex)
          {
-            Console.WriteLine(ex.Message);
+            Debug.WriteLine(ex.Message);
          }
       }
 
