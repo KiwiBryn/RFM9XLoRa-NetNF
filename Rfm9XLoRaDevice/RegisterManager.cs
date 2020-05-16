@@ -91,9 +91,10 @@ namespace devMobile.IoT.Rfm9x
 		{
 			byte[] valueBytes = BitConverter.GetBytes(value);
 			byte[] writeBuffer = new byte[] { address |= RegisterAddressWriteMask, valueBytes[0], valueBytes[1] };
+			byte[] readBuffer = new byte[writeBuffer.Length];
 			Debug.Assert(rfm9XLoraModem != null);
 
-			rfm9XLoraModem.Write(writeBuffer);
+			rfm9XLoraModem.TransferFullDuplex(writeBuffer, readBuffer);
 		}
 
 		public void Write(byte address, byte[] bytes)
