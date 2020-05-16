@@ -26,6 +26,7 @@ namespace devMobile.IoT.Rfm9x.RegisterScan
 #if ESP32_WROOM_32_LORA_1_CHANNEL
    using nanoFramework.Hardware.Esp32;
 #endif
+   using nanoFramework.Runtime.Native;
 
    public sealed class Rfm9XDevice
    {
@@ -90,16 +91,16 @@ namespace devMobile.IoT.Rfm9x.RegisterScan
                {
                   byte registerValue = rfm9XDevice.RegisterReadByte(registerIndex);
 
-                  Console.WriteLine($"Register 0x{registerIndex:x2} - Value 0X{registerValue:x2}");
+                  Debug.WriteLine($"Register 0x{registerIndex:x2} - Value 0X{registerValue:x2}");
                }
-               Console.WriteLine("");
+               Debug.WriteLine("");
 
                Thread.Sleep(10000);
             }
          }
          catch (Exception ex)
          {
-            Console.WriteLine(ex.Message);
+            Debug.WriteLine(ex.Message);
          }
       }
 
