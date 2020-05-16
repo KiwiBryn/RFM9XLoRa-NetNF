@@ -27,6 +27,8 @@ namespace devMobile.IoT.Rfm9x.RegisterReadAndWrite
 #if ESP32_WROOM_32_LORA_1_CHANNEL
    using nanoFramework.Hardware.Esp32;
 #endif
+   using nanoFramework.Runtime.Native;
+
 
    public sealed class Rfm9XDevice
    {
@@ -132,12 +134,12 @@ namespace devMobile.IoT.Rfm9x.RegisterReadAndWrite
 
       public void RegisterDump()
       {
-         Console.WriteLine("Register dump");
+         Debug.WriteLine("Register dump");
          for (byte registerIndex = 0; registerIndex <= 0x42; registerIndex++)
          {
             byte registerValue = this.RegisterReadByte(registerIndex);
 
-            Console.WriteLine($"Register 0x{registerIndex:x2} - Value 0X{registerValue:x2}");
+            Debug.WriteLine($"Register 0x{registerIndex:x2} - Value 0X{registerValue:x2}");
          }
       }
    }
@@ -179,29 +181,29 @@ namespace devMobile.IoT.Rfm9x.RegisterReadAndWrite
 
             while (true)
             {
-               Console.WriteLine("Read RegOpMode (read byte)");
+               Debug.WriteLine("Read RegOpMode (read byte)");
                Byte regOpMode1 = rfm9XDevice.RegisterReadByte(0x1);
-               Console.WriteLine($"RegOpMode 0x{regOpMode1:x2}");
+               Debug.WriteLine($"RegOpMode 0x{regOpMode1:x2}");
 
-               Console.WriteLine("Set LoRa mode and sleep mode (write byte)");
+               Debug.WriteLine("Set LoRa mode and sleep mode (write byte)");
                rfm9XDevice.RegisterWriteByte(0x01, 0b10000000);
 
-               Console.WriteLine("Read RegOpMode (read byte)");
+               Debug.WriteLine("Read RegOpMode (read byte)");
                Byte regOpMode2 = rfm9XDevice.RegisterReadByte(0x1);
-               Console.WriteLine($"RegOpMode 0x{regOpMode2:x2}");
+               Debug.WriteLine($"RegOpMode 0x{regOpMode2:x2}");
 
-               Console.WriteLine("Read the preamble (read word)");
+               Debug.WriteLine("Read the preamble (read word)");
                ushort preamble = rfm9XDevice.RegisterReadWord(0x20);
-               Console.WriteLine($"Preamble 0x{preamble:x2}");
+               Debug.WriteLine($"Preamble 0x{preamble:x2}");
 
-               Console.WriteLine("Set the preamble to 0x80 (write word)");
+               Debug.WriteLine("Set the preamble to 0x80 (write word)");
                rfm9XDevice.RegisterWriteWord(0x20, 0x80);
 
-               Console.WriteLine("Read the center frequency (read byte array)");
+               Debug.WriteLine("Read the center frequency (read byte array)");
                byte[] frequencyReadBytes = rfm9XDevice.RegisterRead(0x06, 3);
-               Console.WriteLine($"Frequency Msb 0x{frequencyReadBytes[0]:x2} Mid 0x{frequencyReadBytes[1]:x2} Lsb 0x{frequencyReadBytes[2]:x2}");
+               Debug.WriteLine($"Frequency Msb 0x{frequencyReadBytes[0]:x2} Mid 0x{frequencyReadBytes[1]:x2} Lsb 0x{frequencyReadBytes[2]:x2}");
 
-               Console.WriteLine("Set the center frequency to 915MHz (write byte array)");
+               Debug.WriteLine("Set the center frequency to 915MHz (write byte array)");
                byte[] frequencyWriteBytes = { 0xE4, 0xC0, 0x00 };
                rfm9XDevice.RegisterWrite(0x06, frequencyWriteBytes);
 
@@ -212,7 +214,7 @@ namespace devMobile.IoT.Rfm9x.RegisterReadAndWrite
          }
          catch (Exception ex)
          {
-            Console.WriteLine(ex.Message);
+            Debug.WriteLine(ex.Message);
          }
       }
 
