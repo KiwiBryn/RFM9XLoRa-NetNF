@@ -23,6 +23,7 @@ namespace devMobile.IoT.Rfm9x
 	using Windows.Devices.Gpio;
 
 	using nanoFramework.Runtime.Events;
+	using nanoFramework.Runtime.Native;
 
 	public sealed class Rfm9XDevice
 	{
@@ -639,7 +640,7 @@ namespace devMobile.IoT.Rfm9x
 
 		private void ProcessTxDone(byte IrqFlags)
 		{
-			//Debug.Assert(IrqFlags != 0);
+			Debug.Assert(IrqFlags != 0);
 			SetMode(RegOpModeModeDefault);
 
 			OnDataTransmitedEventArgs transmitArgs = new OnDataTransmitedEventArgs();
@@ -650,7 +651,7 @@ namespace devMobile.IoT.Rfm9x
 		private void ProcessRxDone(byte IrqFlags)
 		{
 			byte[] payloadBytes;
-			//Debug.Assert(IrqFlags != 0);
+			Debug.Assert(IrqFlags != 0);
 
 			// Check to see if payload has CRC 
 			if (RxDoneIgnoreIfCrcMissing)
@@ -787,12 +788,12 @@ namespace devMobile.IoT.Rfm9x
 #if ADDRESSED_MESSAGES_PAYLOAD
 		public void Send(byte[] addressBytes, byte[] messageBytes)
 		{
-			//Debug.Assert(addressBytes != null);
-			//Debug.Assert(addressBytes.Length > AddressLengthMinimum);
-			//Debug.Assert(addressBytes.Length < AddressLengthMaximum);
-			//Debug.Assert(messageBytes != null);
-			//Debug.Assert(messageBytes.Length >= MessageLengthMinimum);
-			//Debug.Assert(messageBytes.Length <= MessageLengthMaximum);
+			Debug.Assert(addressBytes != null);
+			Debug.Assert(addressBytes.Length > AddressLengthMinimum);
+			Debug.Assert(addressBytes.Length < AddressLengthMaximum);
+			Debug.Assert(messageBytes != null);
+			Debug.Assert(messageBytes.Length >= MessageLengthMinimum);
+			Debug.Assert(messageBytes.Length <= MessageLengthMaximum);
 
 			// construct payload from lengths and addresses
 			byte[] payLoadBytes = new byte[AddressHeaderLength + addressBytes.Length + DeviceAddress.Length + messageBytes.Length];
@@ -813,9 +814,9 @@ namespace devMobile.IoT.Rfm9x
 
 		public void Receive( byte[] address )
 		{
-			//Debug.Assert(address != null);
-			//Debug.Assert(address.Length >= AddressLengthMinimum);
-			//Debug.Assert(address.Length <= AddressLengthMaximum);
+			Debug.Assert(address != null);
+			Debug.Assert(address.Length >= AddressLengthMinimum);
+			Debug.Assert(address.Length <= AddressLengthMaximum);
 			DeviceAddress = address;
 
 			RegOpModeModeDefault = RegOpModeMode.ReceiveContinuous ;
@@ -835,9 +836,9 @@ namespace devMobile.IoT.Rfm9x
 		public void Send(byte[] messageBytes)
 #endif
 		{
-			//Debug.Assert(messageBytes != null);
-			//Debug.Assert(messageBytes.Length >= MessageLengthMinimum);
-			//Debug.Assert(messageBytes.Length <= MessageLengthMaximum);
+			Debug.Assert(messageBytes != null);
+			Debug.Assert(messageBytes.Length >= MessageLengthMinimum);
+			Debug.Assert(messageBytes.Length <= MessageLengthMaximum);
 
 			lock (Rfm9XRegFifoLock)
 			{

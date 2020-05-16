@@ -18,8 +18,9 @@ namespace devMobile.IoT.Rfm9x
 {
 	using System;
 
-	using Windows.Devices.Gpio;
 	using Windows.Devices.Spi;
+
+	using nanoFramework.Runtime.Native;
 
 	public sealed class RegisterManager
 	{
@@ -43,7 +44,7 @@ namespace devMobile.IoT.Rfm9x
 		{
 			byte[] writeBuffer = new byte[] { registerAddress &= RegisterAddressReadMask, 0x0 };
 			byte[] readBuffer = new byte[writeBuffer.Length];
-			//Debug.Assert(rfm9XLoraModem != null);
+			Debug.Assert(rfm9XLoraModem != null);
 
 			rfm9XLoraModem.TransferFullDuplex(writeBuffer, readBuffer);
 
@@ -54,7 +55,7 @@ namespace devMobile.IoT.Rfm9x
 		{
 			byte[] writeBuffer = new byte[] { address &= RegisterAddressReadMask, 0x0, 0x0 };
 			byte[] readBuffer = new byte[writeBuffer.Length];
-			//Debug.Assert(rfm9XLoraModem != null);
+			Debug.Assert(rfm9XLoraModem != null);
 
 			rfm9XLoraModem.TransferFullDuplex(writeBuffer, readBuffer);
 
@@ -66,7 +67,7 @@ namespace devMobile.IoT.Rfm9x
 			byte[] writeBuffer = new byte[length + 1];
 			byte[] readBuffer = new byte[length + 1];
 			byte[] replyBuffer = new byte[length];
-			//Debug.Assert(rfm9XLoraModem != null);
+			Debug.Assert(rfm9XLoraModem != null);
 
 			writeBuffer[0] = address &= RegisterAddressReadMask;
 
@@ -81,7 +82,7 @@ namespace devMobile.IoT.Rfm9x
 		{
 			byte[] writeBuffer = new byte[] { address |= RegisterAddressWriteMask, value };
 			byte[] readBuffer = new byte[writeBuffer.Length];
-			//Debug.Assert(rfm9XLoraModem != null);
+			Debug.Assert(rfm9XLoraModem != null);
 
 			rfm9XLoraModem.TransferFullDuplex(writeBuffer, readBuffer);
 		}
@@ -90,7 +91,7 @@ namespace devMobile.IoT.Rfm9x
 		{
 			byte[] valueBytes = BitConverter.GetBytes(value);
 			byte[] writeBuffer = new byte[] { address |= RegisterAddressWriteMask, valueBytes[0], valueBytes[1] };
-			//Debug.Assert(rfm9XLoraModem != null);
+			Debug.Assert(rfm9XLoraModem != null);
 
 			rfm9XLoraModem.Write(writeBuffer);
 		}
@@ -99,7 +100,7 @@ namespace devMobile.IoT.Rfm9x
 		{
 			byte[] writeBuffer = new byte[1 + bytes.Length];
 			byte[] readBuffer = new byte[writeBuffer.Length];
-			//Debug.Assert(rfm9XLoraModem != null);
+			Debug.Assert(rfm9XLoraModem != null);
 
 			Array.Copy(bytes, 0, writeBuffer, 1, bytes.Length);
 			writeBuffer[0] = address |= RegisterAddressWriteMask;
