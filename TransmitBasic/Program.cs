@@ -28,6 +28,7 @@ namespace devMobile.IoT.Rfm9x.TransmitBasic
 #if ESP32_WROOM_32_LORA_1_CHANNEL
    using nanoFramework.Hardware.Esp32;
 #endif
+   using nanoFramework.Runtime.Native;
 
    public sealed class Rfm9XDevice
    {
@@ -134,12 +135,12 @@ namespace devMobile.IoT.Rfm9x.TransmitBasic
 
       public void RegisterDump()
       {
-         Console.WriteLine("Register dump");
+         Debug.WriteLine("Register dump");
          for (byte registerIndex = 0; registerIndex <= 0x42; registerIndex++)
          {
             byte registerValue = this.RegisterReadByte(registerIndex);
 
-            Console.WriteLine($"Register 0x{registerIndex:x2} - Value 0X{registerValue:x2}");
+            Debug.WriteLine($"Register 0x{registerIndex:x2} - Value 0X{registerValue:x2}");
          }
       }
    }
@@ -204,29 +205,29 @@ namespace devMobile.IoT.Rfm9x.TransmitBasic
                // Set the length of the message in the fifo
                rfm9XDevice.RegisterWriteByte(0x22, (byte)messageBytes.Length); // RegPayloadLength
 
-               Console.WriteLine($"Sending {messageBytes.Length} bytes message {messageText}");
+               Debug.WriteLine($"Sending {messageBytes.Length} bytes message {messageText}");
                /// Set the mode to LoRa + Transmit
                rfm9XDevice.RegisterWriteByte(0x01, 0b10000011); // RegOpMode 
 
                // Wait until send done, no timeouts in PoC
-               Console.WriteLine("Send-wait");
+               Debug.WriteLine("Send-wait");
                byte IrqFlags = rfm9XDevice.RegisterReadByte(0x12); // RegIrqFlags
                while ((IrqFlags & 0b00001000) == 0)  // wait until TxDone cleared
                {
                   Thread.Sleep(10);
                   IrqFlags = rfm9XDevice.RegisterReadByte(0x12); // RegIrqFlags
-                  Console.WriteLine(".");
+                  Debug.WriteLine(".");
                }
-               Console.WriteLine("");
+               Debug.WriteLine("");
                rfm9XDevice.RegisterWriteByte(0x12, 0b00001000); // clear TxDone bit
-               Console.WriteLine("Send-Done");
+               Debug.WriteLine("Send-Done");
 
                Thread.Sleep(10000);
             }
          }
          catch (Exception ex)
          {
-            Console.WriteLine(ex.Message);
+            Debug.WriteLine(ex.Message);
          }
       }
 
