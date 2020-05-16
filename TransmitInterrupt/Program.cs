@@ -28,6 +28,7 @@ namespace devMobile.IoT.Rfm9x.TransmitInterrupt
 #if ESP32_WROOM_32_LORA_1_CHANNEL
    using nanoFramework.Hardware.Esp32;
 #endif
+   using nanoFramework.Runtime.Native;
 
    public sealed class Rfm9XDevice
    {
@@ -91,11 +92,11 @@ namespace devMobile.IoT.Rfm9x.TransmitInterrupt
          }
 
          byte irqFlags = this.RegisterReadByte(0x12); // RegIrqFlags
-         Console.WriteLine($"RegIrqFlags 0X{irqFlags:x2}");
+         Debug.WriteLine($"RegIrqFlags 0X{irqFlags:x2}");
 
          if ((irqFlags & 0b00001000) == 0b00001000)  // TxDone
          {
-            Console.WriteLine("Transmit-Done");
+            Debug.WriteLine("Transmit-Done");
          }
 
          this.RegisterWriteByte(0x12, 0xff);// RegIrqFlags      
@@ -166,12 +167,12 @@ namespace devMobile.IoT.Rfm9x.TransmitInterrupt
 
       public void RegisterDump()
       {
-         Console.WriteLine("Register dump");
+         Debug.WriteLine("Register dump");
          for (byte registerIndex = 0; registerIndex <= 0x42; registerIndex++)
          {
             byte registerValue = this.RegisterReadByte(registerIndex);
 
-            Console.WriteLine($"Register 0x{registerIndex:x2} - Value 0X{registerValue:x2}");
+            Debug.WriteLine($"Register 0x{registerIndex:x2} - Value 0X{registerValue:x2}");
          }
       }
    }
@@ -240,7 +241,7 @@ namespace devMobile.IoT.Rfm9x.TransmitInterrupt
 
                // Set the length of the message in the fifo
                rfm9XDevice.RegisterWriteByte(0x22, (byte)messageBytes.Length); // RegPayloadLength
-               Console.WriteLine($"Sending {messageBytes.Length} bytes message {messageText}");
+               Debug.WriteLine($"Sending {messageBytes.Length} bytes message {messageText}");
                rfm9XDevice.RegisterWriteByte(0x01, 0b10000011); // RegOpMode 
 
                Thread.Sleep(10000);
@@ -248,7 +249,7 @@ namespace devMobile.IoT.Rfm9x.TransmitInterrupt
          }
          catch (Exception ex)
          {
-            Console.WriteLine(ex.Message);
+            Debug.WriteLine(ex.Message);
          }
       }
 
