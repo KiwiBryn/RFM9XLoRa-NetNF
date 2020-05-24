@@ -28,6 +28,7 @@ namespace devMobile.IoT.Rfm9x.ReceiveBasic
 #if ESP32_WROOM_32_LORA_1_CHANNEL
    using nanoFramework.Hardware.Esp32;
 #endif
+   using nanoFramework.Runtime.Native;
 
    public sealed class Rfm9XDevice
    {
@@ -134,12 +135,12 @@ namespace devMobile.IoT.Rfm9x.ReceiveBasic
 
       public void RegisterDump()
       {
-         Console.WriteLine("Register dump");
+         Debug.WriteLine("Register dump");
          for (byte registerIndex = 0; registerIndex <= 0x42; registerIndex++)
          {
             byte registerValue = this.RegisterReadByte(registerIndex);
 
-            Console.WriteLine($"Register 0x{registerIndex:x2} - Value 0X{registerValue:x2}");
+            Debug.WriteLine($"Register 0x{registerIndex:x2} - Value 0X{registerValue:x2}");
          }
       }
    }
@@ -190,17 +191,17 @@ namespace devMobile.IoT.Rfm9x.ReceiveBasic
             while (true)
             {
                // Wait until a packet is received, no timeouts in PoC
-               Console.WriteLine("Receive-Wait");
+               Debug.WriteLine("Receive-Wait");
                byte irqFlags = rfm9XDevice.RegisterReadByte(0x12); // RegIrqFlags
                while ((irqFlags & 0b01000000) == 0)  // wait until RxDone cleared
                {
                   Thread.Sleep(100);
                   irqFlags = rfm9XDevice.RegisterReadByte(0x12); // RegIrqFlags
-                  Console.Write(".");
+                  Debug.Write(".");
                }
-               Console.WriteLine("");
-               Console.WriteLine($"RegIrqFlags 0X{irqFlags:X2}");
-               Console.WriteLine("Receive-Message");
+               Debug.WriteLine("");
+               Debug.WriteLine($"RegIrqFlags 0X{irqFlags:X2}");
+               Debug.WriteLine("Receive-Message");
                byte currentFifoAddress = rfm9XDevice.RegisterReadByte(0x10); // RegFifiRxCurrent
                rfm9XDevice.RegisterWriteByte(0x0d, currentFifoAddress); // RegFifoAddrPtr
 
@@ -221,14 +222,14 @@ namespace devMobile.IoT.Rfm9x.ReceiveBasic
                }
 
                string messageText = UTF8Encoding.UTF8.GetString(messageBytes, 0, messageBytes.Length);
-               Console.WriteLine($"Received {messageBytes.Length} byte message {messageText}");
+               Debug.WriteLine($"Received {messageBytes.Length} byte message {messageText}");
 
-               Console.WriteLine("Receive-Done");
+               Debug.WriteLine("Receive-Done");
             }
          }
          catch (Exception ex)
          {
-            Console.WriteLine(ex.Message);
+            Debug.WriteLine(ex.Message);
          }
       }
 
