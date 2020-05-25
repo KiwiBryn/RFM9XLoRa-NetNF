@@ -16,6 +16,7 @@
 //---------------------------------------------------------------------------------
 //#define ST_STM32F429I_DISCOVERY       //nanoff --target ST_STM32F429I_DISCOVERY --update
 #define ESP32_WROOM_32_LORA_1_CHANNEL   //nanoff --target ESP32_WROOM_32 --serialport COM4 --update
+//#define ST_STM32F769I_DISCOVERY      // nanoff --target ST_STM32F769I_DISCOVERY --update
 namespace devMobile.IoT.Rfm9x.ShieldSPI
 {
    using System;
@@ -35,6 +36,9 @@ namespace devMobile.IoT.Rfm9x.ShieldSPI
 #if ST_STM32F429I_DISCOVERY
       private const string SpiBusId = "SPI5";
 #endif
+#if ST_STM32F769I_DISCOVERY
+      private const string SpiBusId = "SPI5";
+#endif
 #if ESP32_WROOM_32_LORA_1_CHANNEL
       private const string SpiBusId = "SPI1";
 #endif
@@ -44,6 +48,13 @@ namespace devMobile.IoT.Rfm9x.ShieldSPI
 #if ST_STM32F429I_DISCOVERY
          int ledPinNumber  = PinNumber('G', 14);
          int chipSelectPinNumber = PinNumber('C', 2);
+#endif
+#if ST_STM32F769I_DISCOVERY
+         int ledPinNumber  = PinNumber('J', 5);
+         // Arduino D10->PA11
+         int chipSelectPinNumber = PinNumber('A', 11);
+         // Arduino D9->PH6
+         int resetPinNumber = PinNumber('H', 6);
 #endif
 #if ESP32_WROOM_32_LORA_1_CHANNEL
          int ledPinNumber = Gpio.IO17;
@@ -56,6 +67,12 @@ namespace devMobile.IoT.Rfm9x.ShieldSPI
             GpioPin led = gpioController.OpenPin(ledPinNumber);
             led.SetDriveMode(GpioPinDriveMode.Output);
 
+#if ST_STM32F769I_DISCOVERYX
+            // Setup the reset pin just incase
+            GpioPin resetGpioPin = gpioController.OpenPin(resetPinNumber);
+            resetGpioPin.SetDriveMode(GpioPinDriveMode.Output);
+            resetGpioPin.Write(GpioPinValue.High);
+#endif
 #if ESP32_WROOM_32_LORA_1_CHANNEL
             Configuration.SetPinFunction(nanoFramework.Hardware.Esp32.Gpio.IO12, DeviceFunction.SPI1_MISO);
             Configuration.SetPinFunction(nanoFramework.Hardware.Esp32.Gpio.IO13, DeviceFunction.SPI1_MOSI);
@@ -78,7 +95,7 @@ namespace devMobile.IoT.Rfm9x.ShieldSPI
                   byte[] writeBuffer = new byte[] { RegVersion, 0x0 };
                   byte[] readBuffer = new byte[writeBuffer.Length];
 
-                  device.TransferFullDuplex(writeBuffer, readBuffer); 
+                  device.TransferFullDuplex(writeBuffer, readBuffer);
 
                   Debug.WriteLine(String.Format("Register 0x{0:x2} - Value 0X{1:x2}", RegVersion, readBuffer[1]));
 
@@ -93,7 +110,7 @@ namespace devMobile.IoT.Rfm9x.ShieldSPI
          }
       }
 
-#if ST_STM32F429I_DISCOVERY
+#if ST_STM32F429I_DISCOVERY || ST_STM32F769I_DISCOVERY
       static int PinNumber(char port, byte pin)
       {
          if (port < 'A' || port > 'J')
