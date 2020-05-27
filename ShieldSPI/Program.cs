@@ -14,9 +14,11 @@
 // limitations under the License.
 //
 //---------------------------------------------------------------------------------
+#define ST_NUCLEO64_F091RC // nanoff --target ST_NUCLEO64_F091RC --update
 //#define ST_STM32F429I_DISCOVERY       //nanoff --target ST_STM32F429I_DISCOVERY --update
-#define ESP32_WROOM_32_LORA_1_CHANNEL   //nanoff --target ESP32_WROOM_32 --serialport COM4 --update
-//#define ST_STM32F769I_DISCOVERY      // nanoff --target ST_STM32F769I_DISCOVERY --update
+//#define ESP32_WROOM_32_LORA_1_CHANNEL   //nanoff --target ESP32_WROOM_32 --serialport COM4 --update
+//NOTE May 2020 ST_STM32F769I_DISCOVERY device doesn't work SPI2 mappings broken 
+//#define ST_STM32F769I_DISCOVERY      // nanoff --target ST_STM32F769I_DISCOVERY --update 
 namespace devMobile.IoT.Rfm9x.ShieldSPI
 {
    using System;
@@ -33,6 +35,9 @@ namespace devMobile.IoT.Rfm9x.ShieldSPI
    public class Program
    {
       private const byte RegVersion = 0x42;
+#if ST_NUCLEO64_F091RC
+      private const string SpiBusId = "SPI1";
+#endif
 #if ST_STM32F429I_DISCOVERY
       private const string SpiBusId = "SPI5";
 #endif
@@ -45,7 +50,13 @@ namespace devMobile.IoT.Rfm9x.ShieldSPI
 
       public static void Main()
       {
-#if ST_STM32F429I_DISCOVERY
+#if ST_NUCLEO64_F091RC // No LED for this device as driven by D13 the SPI CLK line
+         // Arduino D10->PB6
+         int chipSelectPinNumber = PinNumber('B', 6);
+         // Arduino D9->PC7
+         int resetPinNumber = PinNumber('C', 7);
+#endif
+#if ST_STM32F429I_DISCOVERY // No reset line for this device as I didn't bother with jumper to SX127X pin
          int ledPinNumber  = PinNumber('G', 14);
          int chipSelectPinNumber = PinNumber('C', 2);
 #endif
@@ -56,23 +67,29 @@ namespace devMobile.IoT.Rfm9x.ShieldSPI
          // Arduino D9->PH6
          int resetPinNumber = PinNumber('H', 6);
 #endif
-#if ESP32_WROOM_32_LORA_1_CHANNEL
+#if ESP32_WROOM_32_LORA_1_CHANNEL // No reset line for this device as it isn't connected on SX127X
          int ledPinNumber = Gpio.IO17;
          int chipSelectPinNumber = Gpio.IO16;
 #endif
+         Debug.WriteLine("devMobile.IoT.Rfm9x.ShieldSPI starting");
 
          try
          {
             GpioController gpioController = GpioController.GetDefault();
-            GpioPin led = gpioController.OpenPin(ledPinNumber);
-            led.SetDriveMode(GpioPinDriveMode.Output);
 
-#if ST_STM32F769I_DISCOVERYX
-            // Setup the reset pin just incase
+#if ST_NUCLEO64_F091RC || ST_STM32F769I_DISCOVERY
+            // Setup the reset pin
             GpioPin resetGpioPin = gpioController.OpenPin(resetPinNumber);
             resetGpioPin.SetDriveMode(GpioPinDriveMode.Output);
             resetGpioPin.Write(GpioPinValue.High);
 #endif
+
+#if ST_STM32F429I_DISCOVERY || ST_STM32F769I_DISCOVERY || ESP32_WROOM_32_LORA_1_CHANNEL
+            // Setup the onboard LED
+            GpioPin led = gpioController.OpenPin(ledPinNumber);
+            led.SetDriveMode(GpioPinDriveMode.Output);
+#endif
+
 #if ESP32_WROOM_32_LORA_1_CHANNEL
             Configuration.SetPinFunction(nanoFramework.Hardware.Esp32.Gpio.IO12, DeviceFunction.SPI1_MISO);
             Configuration.SetPinFunction(nanoFramework.Hardware.Esp32.Gpio.IO13, DeviceFunction.SPI1_MOSI);
@@ -89,7 +106,7 @@ namespace devMobile.IoT.Rfm9x.ShieldSPI
             using (SpiDevice device = SpiDevice.FromId(SpiBusId, settings))
             {
                Thread.Sleep(500);
-
+            
                while (true)
                {
                   byte[] writeBuffer = new byte[] { RegVersion, 0x0 };
@@ -99,7 +116,9 @@ namespace devMobile.IoT.Rfm9x.ShieldSPI
 
                   Debug.WriteLine(String.Format("Register 0x{0:x2} - Value 0X{1:x2}", RegVersion, readBuffer[1]));
 
-                  led.Toggle();
+                  #if ST_STM32F429I_DISCOVERY || ST_STM32F769I_DISCOVERY || ESP32_WROOM_32_LORA_1_CHANNEL
+                     led.Toggle();
+                  #endif
                   Thread.Sleep(10000);
                }
             }
@@ -110,7 +129,7 @@ namespace devMobile.IoT.Rfm9x.ShieldSPI
          }
       }
 
-#if ST_STM32F429I_DISCOVERY || ST_STM32F769I_DISCOVERY
+#if ST_NUCLEO64_F091RC || ST_STM32F429I_DISCOVERY || ST_STM32F769I_DISCOVERY
       static int PinNumber(char port, byte pin)
       {
          if (port < 'A' || port > 'J')
