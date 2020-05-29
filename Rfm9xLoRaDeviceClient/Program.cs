@@ -16,7 +16,8 @@
 //---------------------------------------------------------------------------------
 //#define ADDRESSED_MESSAGES_PAYLOAD
 //#define ST_STM32F429I_DISCOVERY       //nanoff --target ST_STM32F429I_DISCOVERY --update
-#define ESP32_WROOM_32_LORA_1_CHANNEL   //nanoff --target ESP32_WROOM_32 --serialport COM4 --update
+//#define ESP32_WROOM_32_LORA_1_CHANNEL   //nanoff --target ESP32_WROOM_32 --serialport COM4 --update
+#define NETDUINO3_WIFI   // nanoff --target NETDUINO3_WIFI --update
 namespace devMobile.IoT.Rfm9x.LoRaDeviceClient
 {
 	using System;
@@ -41,6 +42,10 @@ namespace devMobile.IoT.Rfm9x.LoRaDeviceClient
 		private const string DeviceName = "ESP32";
 		private const string SpiBusId = "SPI1";
 #endif
+#if NETDUINO3_WIFI
+		private const string DeviceName = "N3W";
+		private const string SpiBusId = "SPI2";
+#endif
 #if ADDRESSED_MESSAGES_PAYLOAD
 		private const string DeviceName = "LoRaIoT1";
 #endif
@@ -63,7 +68,16 @@ namespace devMobile.IoT.Rfm9x.LoRaDeviceClient
 
 			Rfm9XDevice rfm9XDevice = new Rfm9XDevice(SpiBusId, chipSelectPinNumber, interruptPinNumber);
 #endif
-#if ST_STM32F429I_DISCOVERY
+#if NETDUINO3_WIFI
+			int ledPinNumber = PinNumber('A', 10);
+			// Arduino D10->PB10
+			int chipSelectPinNumber = PinNumber('B', 10);
+			// Arduino D9->PE5
+			int resetPinNumber = PinNumber('E', 5);
+			int interruptPinNumber = PinNumber('A', 3);
+#endif
+
+#if ST_STM32F429I_DISCOVERY || NETDUINO3_WIFI
 			Rfm9XDevice rfm9XDevice = new Rfm9XDevice(SpiBusId, chipSelectPinNumber, resetPinNumber, interruptPinNumber);
 #endif
 			rfm9XDevice.Initialise(Frequency, paBoost: true);
@@ -132,8 +146,8 @@ namespace devMobile.IoT.Rfm9x.LoRaDeviceClient
 			Debug.WriteLine(string.Format("{0}-TX Done", DateTime.UtcNow.ToString("HH:mm:ss")));
 		}
 
-#if ST_STM32F429I_DISCOVERY
-      static int PinNumber(char port, byte pin)
+#if ST_STM32F429I_DISCOVERY || NETDUINO3_WIFI
+		static int PinNumber(char port, byte pin)
       {
          if (port < 'A' || port > 'J')
             throw new ArgumentException();
