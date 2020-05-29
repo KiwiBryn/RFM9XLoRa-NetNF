@@ -16,6 +16,7 @@
 //---------------------------------------------------------------------------------
 //#define ST_STM32F429I_DISCOVERY       //nanoff --target ST_STM32F429I_DISCOVERY --update
 #define ESP32_WROOM_32_LORA_1_CHANNEL   //nanoff --target ESP32_WROOM_32 --serialport COM4 --update
+//#define NETDUINO3_WIFI   // nanoff --target NETDUINO3_WIFI --update
 namespace devMobile.IoT.Rfm9x.TransmitBasic
 {
    using System;
@@ -153,6 +154,9 @@ namespace devMobile.IoT.Rfm9x.TransmitBasic
 #if ESP32_WROOM_32_LORA_1_CHANNEL
       private const string SpiBusId = "SPI1";
 #endif
+#if NETDUINO3_WIFI
+      private const string SpiBusId = "SPI2";
+#endif
 
       static void Main()
       {
@@ -164,6 +168,11 @@ namespace devMobile.IoT.Rfm9x.TransmitBasic
 #if ESP32_WROOM_32_LORA_1_CHANNEL
          int chipSelectPinNumber = Gpio.IO16;
 #endif
+#if NETDUINO3_WIFI
+         int chipSelectPinNumber = PinNumber('B', 10);
+         int resetPinNumber = PinNumber('E', 5);
+#endif
+
          try
          {
 #if ESP32_WROOM_32_LORA_1_CHANNEL
@@ -172,13 +181,13 @@ namespace devMobile.IoT.Rfm9x.TransmitBasic
             Configuration.SetPinFunction(Gpio.IO14, DeviceFunction.SPI1_CLOCK);
             Rfm9XDevice rfm9XDevice = new Rfm9XDevice(SpiBusId, chipSelectPinNumber);
 #endif
-#if ST_STM32F429I_DISCOVERY
+#if ST_STM32F429I_DISCOVERY || NETDUINO3_WIFI
             Rfm9XDevice rfm9XDevice = new Rfm9XDevice(SpiBusId, chipSelectPinNumber, resetPinNumber);
 #endif
             Thread.Sleep(500);
 
             // Put device into LoRa + Standby mode
-            rfm9XDevice.RegisterWriteByte(0x01, 0b10000001); // RegOpMode 
+            rfm9XDevice.RegisterWriteByte(0x01, 0b10000000); // RegOpMode 
 
             // Set the frequency to 915MHz
             byte[] frequencyWriteBytes = { 0xE4, 0xC0, 0x00 }; // RegFrMsb, RegFrMid, RegFrLsb
@@ -216,7 +225,7 @@ namespace devMobile.IoT.Rfm9x.TransmitBasic
                {
                   Thread.Sleep(10);
                   IrqFlags = rfm9XDevice.RegisterReadByte(0x12); // RegIrqFlags
-                  Debug.WriteLine(".");
+                  Debug.Write(".");
                }
                Debug.WriteLine("");
                rfm9XDevice.RegisterWriteByte(0x12, 0b00001000); // clear TxDone bit
@@ -231,7 +240,7 @@ namespace devMobile.IoT.Rfm9x.TransmitBasic
          }
       }
 
-#if ST_STM32F429I_DISCOVERY
+#if ST_STM32F429I_DISCOVERY || NETDUINO3_WIFI
       static int PinNumber(char port, byte pin)
       {
          if (port < 'A' || port > 'J')
