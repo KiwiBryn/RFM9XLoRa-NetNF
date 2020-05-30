@@ -24,6 +24,7 @@
 namespace devMobile.IoT.Rfm9x.ShieldSPI
 {
    using System;
+   using System.Diagnostics;
    using System.Threading;
 
    using Windows.Devices.Gpio;
@@ -32,7 +33,6 @@ namespace devMobile.IoT.Rfm9x.ShieldSPI
 #if ESP32_WROOM_32_LORA_1_CHANNEL
    using nanoFramework.Hardware.Esp32;
 #endif
-   using nanoFramework.Runtime.Native;
 
    public class Program
    {
