@@ -15,19 +15,19 @@
 //
 //---------------------------------------------------------------------------------
 //#define ADDRESSED_MESSAGES_PAYLOAD
-//#define ST_STM32F429I_DISCOVERY       //nanoff --target ST_STM32F429I_DISCOVERY --update
 //#define ESP32_WROOM_32_LORA_1_CHANNEL   //nanoff --target ESP32_WROOM_32 --serialport COM4 --update
 #define NETDUINO3_WIFI   // nanoff --target NETDUINO3_WIFI --update
+//#define ST_STM32F429I_DISCOVERY       //nanoff --target ST_STM32F429I_DISCOVERY --update
 namespace devMobile.IoT.Rfm9x.LoRaDeviceClient
 {
 	using System;
+	using System.Diagnostics;
 	using System.Text;
 	using System.Threading;
 
 #if ESP32_WROOM_32_LORA_1_CHANNEL
 	using nanoFramework.Hardware.Esp32;
 #endif
-	using nanoFramework.Runtime.Native;
 
 	using devMobile.IoT.Rfm9x;
 
@@ -69,13 +69,14 @@ namespace devMobile.IoT.Rfm9x.LoRaDeviceClient
 			Rfm9XDevice rfm9XDevice = new Rfm9XDevice(SpiBusId, chipSelectPinNumber, interruptPinNumber);
 #endif
 #if NETDUINO3_WIFI
-			int ledPinNumber = PinNumber('A', 10);
 			// Arduino D10->PB10
 			int chipSelectPinNumber = PinNumber('B', 10);
 			// Arduino D9->PE5
 			int resetPinNumber = PinNumber('E', 5);
+			// Arduino D2->PA3
 			int interruptPinNumber = PinNumber('A', 3);
 #endif
+			Debug.WriteLine("devMobile.IoT.Rfm9x.LoRaDeviceClient starting");
 
 #if ST_STM32F429I_DISCOVERY || NETDUINO3_WIFI
 			Rfm9XDevice rfm9XDevice = new Rfm9XDevice(SpiBusId, chipSelectPinNumber, resetPinNumber, interruptPinNumber);

@@ -17,14 +17,13 @@
 namespace devMobile.IoT.Rfm9x
 {
 	using System;
+	using System.Diagnostics;
 
 	using Windows.Devices.Spi;
 
-	using nanoFramework.Runtime.Native;
-
 	public sealed class RegisterManager
 	{
-		private SpiDevice rfm9XLoraModem;
+		private readonly SpiDevice rfm9XLoraModem;
 		private const byte RegisterAddressReadMask = 0X7f;
 		private const byte RegisterAddressWriteMask = 0x80;
 
@@ -109,14 +108,14 @@ namespace devMobile.IoT.Rfm9x
 			rfm9XLoraModem.TransferFullDuplex(writeBuffer, readBuffer);
 		}
 
-		public void Dump(byte start, byte finish)
+		public void Dump(byte start = 0x0, byte finish = 0x42)
 		{
-			Console.WriteLine("Register dump");
-			for (byte registerIndex = 0; registerIndex <= 0x42; registerIndex++)
+			Debug.WriteLine("Register dump");
+			for (byte registerIndex = start; registerIndex <= finish; registerIndex++)
 			{
 				byte registerValue = this.ReadByte(registerIndex);
 
-				Console.WriteLine($"Register 0x{registerIndex:x2} - Value 0X{registerValue:x2}");
+				Debug.WriteLine($"Register 0x{registerIndex:x2} - Value 0X{registerValue:x2}");
 			}
 		}
 	}

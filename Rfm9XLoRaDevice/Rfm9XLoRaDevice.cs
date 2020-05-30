@@ -18,12 +18,12 @@
 namespace devMobile.IoT.Rfm9x
 {
    using System;
+	using System.Diagnostics;
 	using System.Threading;
 
 	using Windows.Devices.Gpio;
 
 	using nanoFramework.Runtime.Events;
-	using nanoFramework.Runtime.Native;
 
 	public sealed class Rfm9XDevice
 	{
