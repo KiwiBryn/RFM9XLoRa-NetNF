@@ -20,6 +20,7 @@
 namespace devMobile.IoT.Rfm9x.ReceiveBasic
 {
    using System;
+   using System.Diagnostics;
    using System.Text;
    using System.Threading;
 
@@ -29,11 +30,10 @@ namespace devMobile.IoT.Rfm9x.ReceiveBasic
 #if ESP32_WROOM_32_LORA_1_CHANNEL
    using nanoFramework.Hardware.Esp32;
 #endif
-   using nanoFramework.Runtime.Native;
 
    public sealed class Rfm9XDevice
    {
-      private SpiDevice rfm9XLoraModem;
+      private readonly SpiDevice rfm9XLoraModem;
       private const byte RegisterAddressReadMask = 0X7f;
       private const byte RegisterAddressWriteMask = 0x80;
 
