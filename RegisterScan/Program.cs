@@ -31,7 +31,7 @@ namespace devMobile.IoT.Rfm9x.RegisterScan
 
    public sealed class Rfm9XDevice
    {
-      private SpiDevice rfm9XLoraModem;
+      private readonly SpiDevice rfm9XLoraModem;
 
       public Rfm9XDevice(string SpiPort, int chipSelectPin)
       {
