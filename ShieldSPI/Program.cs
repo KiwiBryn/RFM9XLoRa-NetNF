@@ -14,12 +14,13 @@
 // limitations under the License.
 //
 //---------------------------------------------------------------------------------
-#define ESP32_WROOM_32_LORA_1_CHANNEL   //nanoff --target ESP32_WROOM_32 --serialport COM4 --update
+//#define ESP32_WROOM_32_LORA_1_CHANNEL   //nanoff --target ESP32_WROOM_32 --serialport COM4 --update
 //#define NETDUINO3_WIFI   // nanoff --target NETDUINO3_WIFI --update
 //NOTE May 2020 MBN_QUAIL device doesn't work something broken in SPI configuration
 //#define MBN_QUAIL // nanoff --target MBN_QUAIL --update
 //NOTE May 2020 ST_NUCLEO64_F091RC device doesn't work something broken in SPI configuration
 //#define ST_NUCLEO64_F091RC // nanoff --target ST_NUCLEO64_F091RC --update
+#define ST_NUCLEO144_F746ZG //nanoff --target ST_NUCLEO144_F746ZG --update
 //#define ST_STM32F429I_DISCOVERY       //nanoff --target ST_STM32F429I_DISCOVERY --update
 //NOTE May 2020 ST_STM32F769I_DISCOVERY device doesn't work SPI2 mappings broken 
 //#define ST_STM32F769I_DISCOVERY      // nanoff --target ST_STM32F769I_DISCOVERY --update 
@@ -47,8 +48,11 @@ namespace devMobile.IoT.Rfm9x.ShieldSPI
 #endif
 #if MBN_QUAIL
       private const string SpiBusId = "SPI1";
-#endif 
+#endif
 #if ST_NUCLEO64_F091RC
+      private const string SpiBusId = "SPI1";
+#endif
+#if ST_NUCLEO144_F746ZG
       private const string SpiBusId = "SPI1";
 #endif
 #if ST_STM32F429I_DISCOVERY
@@ -92,6 +96,13 @@ namespace devMobile.IoT.Rfm9x.ShieldSPI
          int ledPinNumber  = PinNumber('G', 14);
          int chipSelectPinNumber = PinNumber('C', 2);
 #endif
+#if ST_NUCLEO144_F746ZG
+         int ledPinNumber = PinNumber('B', 7);
+         // Arduino D10->PD14
+         int chipSelectPinNumber = PinNumber('D', 14);
+         // Arduino D9->PD15
+         int resetPinNumber = PinNumber('D', 15);
+#endif
 #if ST_STM32F769I_DISCOVERY
          int ledPinNumber  = PinNumber('J', 5);
          // Arduino D10->PA11
@@ -105,14 +116,14 @@ namespace devMobile.IoT.Rfm9x.ShieldSPI
          {
             GpioController gpioController = GpioController.GetDefault();
 
-#if NETDUINO3_WIFI|| MBN_QUAIL || ST_NUCLEO64_F091RC || ST_STM32F769I_DISCOVERY
+#if NETDUINO3_WIFI|| MBN_QUAIL || ST_NUCLEO64_F091RC || ST_NUCLEO144_F746ZG || ST_STM32F769I_DISCOVERY
             // Setup the reset pin
             GpioPin resetGpioPin = gpioController.OpenPin(resetPinNumber);
             resetGpioPin.SetDriveMode(GpioPinDriveMode.Output);
             resetGpioPin.Write(GpioPinValue.High);
 #endif
 
-#if ESP32_WROOM_32_LORA_1_CHANNEL || MBN_QUAIL || NETDUINO3_WIFI || ST_STM32F429I_DISCOVERY || ST_STM32F769I_DISCOVERY
+#if ESP32_WROOM_32_LORA_1_CHANNEL || MBN_QUAIL || NETDUINO3_WIFI || ST_NUCLEO144_F746ZG || ST_STM32F429I_DISCOVERY || ST_STM32F769I_DISCOVERY
             // Setup the onboard LED
             GpioPin led = gpioController.OpenPin(ledPinNumber);
             led.SetDriveMode(GpioPinDriveMode.Output);
@@ -144,7 +155,7 @@ namespace devMobile.IoT.Rfm9x.ShieldSPI
 
                   Debug.WriteLine(String.Format("Register 0x{0:x2} - Value 0X{1:x2}", RegVersion, readBuffer[1]));
 
-                  #if ESP32_WROOM_32_LORA_1_CHANNEL || MBN_QUAIL || NETDUINO3_WIFI || ST_STM32F429I_DISCOVERY || ST_STM32F769I_DISCOVERY
+                  #if ESP32_WROOM_32_LORA_1_CHANNEL || MBN_QUAIL || NETDUINO3_WIFI || ST_NUCLEO144_F746ZG || ST_STM32F429I_DISCOVERY || ST_STM32F769I_DISCOVERY
                      led.Toggle();
                   #endif
                   Thread.Sleep(10000);
@@ -157,7 +168,7 @@ namespace devMobile.IoT.Rfm9x.ShieldSPI
          }
       }
 
-#if  NETDUINO3_WIFI || MBN_QUAIL || ST_NUCLEO64_F091RC || ST_STM32F429I_DISCOVERY || ST_STM32F769I_DISCOVERY
+#if  NETDUINO3_WIFI || MBN_QUAIL || ST_NUCLEO64_F091RC || ST_NUCLEO144_F746ZG || ST_STM32F429I_DISCOVERY || ST_STM32F769I_DISCOVERY
       static int PinNumber(char port, byte pin)
       {
          if (port < 'A' || port > 'J')
