@@ -112,6 +112,8 @@ namespace devMobile.IoT.Rfm9x.ShieldSPI
 #endif
          Debug.WriteLine("devMobile.IoT.Rfm9x.ShieldSPI starting");
 
+         Debug.WriteLine(Windows.Devices.Spi.SpiDevice.GetDeviceSelector());
+
          try
          {
             GpioController gpioController = GpioController.GetDefault();
@@ -145,7 +147,7 @@ namespace devMobile.IoT.Rfm9x.ShieldSPI
             using (SpiDevice device = SpiDevice.FromId(SpiBusId, settings))
             {
                Thread.Sleep(500);
-            
+
                while (true)
                {
                   byte[] writeBuffer = new byte[] { RegVersion, 0x0 };
@@ -160,7 +162,7 @@ namespace devMobile.IoT.Rfm9x.ShieldSPI
                   #endif
                   Thread.Sleep(10000);
                }
-            }
+            }           
          }
          catch (Exception ex)
          {
