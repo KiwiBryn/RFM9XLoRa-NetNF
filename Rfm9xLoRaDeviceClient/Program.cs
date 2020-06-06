@@ -47,7 +47,7 @@ namespace devMobile.IoT.Rfm9x.LoRaDeviceClient
 		private const string SpiBusId = "SPI2";
 #endif
 #if ADDRESSED_MESSAGES_PAYLOAD
-		private const string DeviceName = "LoRaIoT1";
+		private const string HostName = "LoRaIoT1";
 #endif
 
 		static void Main()
