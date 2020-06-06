@@ -50,19 +50,21 @@ namespace devMobile.IoT.Rfm9x.RangeTester
 		private const string SpiBusId = "SPI2";
 #endif
 #if ADDRESSED_MESSAGES_PAYLOAD
-		private const string DeviceName = "LoRaIoT1";
+		private const string HostName = "LoRaIoT1";
 #endif
 
 		static void Main()
 		{
 			byte MessageCount = System.Byte.MaxValue;
 #if ST_STM32F429I_DISCOVERY
+			int ledPinNumber = PinNumber('G', 14);
 			int chipSelectPinNumber = PinNumber('C', 2);
 			int resetPinNumber = PinNumber('C', 3);
 			int interruptPinNumber = PinNumber('A', 4);
 #endif
 #if ESP32_WROOM_32_LORA_1_CHANNEL
-         int chipSelectPinNumber = Gpio.IO16;
+			int ledPinNumber = Gpio.IO17;
+			int chipSelectPinNumber = Gpio.IO16;
          int interruptPinNumber = Gpio.IO26;
 
 			Configuration.SetPinFunction(Gpio.IO12, DeviceFunction.SPI1_MISO);
