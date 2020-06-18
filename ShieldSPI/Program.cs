@@ -15,12 +15,13 @@
 //
 //---------------------------------------------------------------------------------
 //#define ESP32_WROOM_32_LORA_1_CHANNEL   //nanoff --target ESP32_WROOM_32 --serialport COM4 --update
-//#define NETDUINO3_WIFI   // nanoff --target NETDUINO3_WIFI --update
+#define NETDUINO3_WIFI   // nanoff --target NETDUINO3_WIFI --update
 //NOTE May 2020 MBN_QUAIL device doesn't work something broken in SPI configuration
 //#define MBN_QUAIL // nanoff --target MBN_QUAIL --update
 //NOTE May 2020 ST_NUCLEO64_F091RC device doesn't work something broken in SPI configuration
 //#define ST_NUCLEO64_F091RC // nanoff --target ST_NUCLEO64_F091RC --update
-#define ST_NUCLEO144_F746ZG //nanoff --target ST_NUCLEO144_F746ZG --update
+//NOTE May 2020 ST_NUCLEO144_F746ZG device doesn't work something broken in SPI configuration without jumpers
+//#define ST_NUCLEO144_F746ZG //nanoff --target ST_NUCLEO144_F746ZG --update
 //#define ST_STM32F429I_DISCOVERY       //nanoff --target ST_STM32F429I_DISCOVERY --update
 //NOTE May 2020 ST_STM32F769I_DISCOVERY device doesn't work SPI2 mappings broken 
 //#define ST_STM32F769I_DISCOVERY      // nanoff --target ST_STM32F769I_DISCOVERY --update 

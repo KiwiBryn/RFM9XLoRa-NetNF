@@ -17,6 +17,7 @@
 //#define ST_STM32F429I_DISCOVERY       //nanoff --target ST_STM32F429I_DISCOVERY --update
 //#define ESP32_WROOM_32_LORA_1_CHANNEL   //nanoff --target ESP32_WROOM_32 --serialport COM4 --update
 #define NETDUINO3_WIFI   // nanoff --target NETDUINO3_WIFI --update
+//#define ST_NUCLEO144_F746ZG //nanoff --target ST_NUCLEO144_F746ZG --update
 namespace devMobile.IoT.Rfm9x.RegisterScan
 {
    using System;
@@ -68,6 +69,9 @@ namespace devMobile.IoT.Rfm9x.RegisterScan
 #if NETDUINO3_WIFI
       private const string SpiBusId = "SPI2";
 #endif
+#if ST_NUCLEO144_F746ZG
+      private const string SpiBusId = "SPI1";
+#endif
 
       public static void Main()
       {
@@ -79,6 +83,9 @@ namespace devMobile.IoT.Rfm9x.RegisterScan
 #endif
 #if NETDUINO3_WIFI
          int chipSelectPinNumber = PinNumber('B', 10);
+#endif
+#if ST_NUCLEO144_F746ZG
+         int chipSelectPinNumber = PinNumber('D', 14);
 #endif
 
          try
@@ -111,7 +118,7 @@ namespace devMobile.IoT.Rfm9x.RegisterScan
          }
       }
 
-#if ST_STM32F429I_DISCOVERY ||NETDUINO3_WIFI
+#if ST_STM32F429I_DISCOVERY ||NETDUINO3_WIFI || ST_NUCLEO144_F746ZG
       static int PinNumber(char port, byte pin)
       {
          if (port < 'A' || port > 'J')

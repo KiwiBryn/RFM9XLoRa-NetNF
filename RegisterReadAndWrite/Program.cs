@@ -17,6 +17,7 @@
 //#define ST_STM32F429I_DISCOVERY       //nanoff --target ST_STM32F429I_DISCOVERY --update
 //#define ESP32_WROOM_32_LORA_1_CHANNEL   //nanoff --target ESP32_WROOM_32 --serialport COM4 --update
 #define NETDUINO3_WIFI   // nanoff --target NETDUINO3_WIFI --update
+//#define ST_NUCLEO144_F746ZG //nanoff --target ST_NUCLEO144_F746ZG --update
 namespace devMobile.IoT.Rfm9x.RegisterReadAndWrite
 {
    using System;
@@ -155,6 +156,9 @@ namespace devMobile.IoT.Rfm9x.RegisterReadAndWrite
 #if NETDUINO3_WIFI
       private const string SpiBusId = "SPI2";
 #endif
+#if ST_NUCLEO144_F746ZG
+      private const string SpiBusId = "SPI1";
+#endif
 
       static void Main()
       {
@@ -169,6 +173,12 @@ namespace devMobile.IoT.Rfm9x.RegisterReadAndWrite
          int chipSelectPinNumber = PinNumber('B', 10);
          int resetPinNumber = PinNumber('E', 5);
 #endif
+#if ST_NUCLEO144_F746ZG
+         int chipSelectPinNumber = PinNumber('D', 14);
+         int resetPinNumber = PinNumber('D', 15);
+#endif
+
+         Debug.WriteLine("devMobile.IoT.Rfm9x.ShieldSPI starting");
 
          try
          {
@@ -179,7 +189,7 @@ namespace devMobile.IoT.Rfm9x.RegisterReadAndWrite
 
             Rfm9XDevice rfm9XDevice = new Rfm9XDevice(SpiBusId, chipSelectPinNumber);
 #endif
-#if ST_STM32F429I_DISCOVERY || NETDUINO3_WIFI
+#if ST_STM32F429I_DISCOVERY || NETDUINO3_WIFI || ST_NUCLEO144_F746ZG
             Rfm9XDevice rfm9XDevice = new Rfm9XDevice(SpiBusId, chipSelectPinNumber, resetPinNumber);
 #endif
             Thread.Sleep(500);
@@ -225,7 +235,7 @@ namespace devMobile.IoT.Rfm9x.RegisterReadAndWrite
          }
       }
 
-#if ST_STM32F429I_DISCOVERY ||NETDUINO3_WIFI
+#if ST_STM32F429I_DISCOVERY ||NETDUINO3_WIFI || ST_NUCLEO144_F746ZG
       static int PinNumber(char port, byte pin)
       {
          if (port < 'A' || port > 'J')
