@@ -15,8 +15,8 @@
 //
 //---------------------------------------------------------------------------------
 //#define ADDRESSED_MESSAGES_PAYLOAD
-//#define ESP32_WROOM_32_LORA_1_CHANNEL   //nanoff --target ESP32_WROOM_32 --serialport COM4 --update
-#define NETDUINO3_WIFI   // nanoff --target NETDUINO3_WIFI --update
+#define ESP32_WROOM_32_LORA_1_CHANNEL   //nanoff --target ESP32_WROOM_32 --serialport COM4 --update
+//#define NETDUINO3_WIFI   // nanoff --target NETDUINO3_WIFI --update
 //#define ST_STM32F429I_DISCOVERY       //nanoff --target ST_STM32F429I_DISCOVERY --update
 namespace devMobile.IoT.Rfm9x.LoRaDeviceClient
 {
@@ -99,11 +99,11 @@ namespace devMobile.IoT.Rfm9x.LoRaDeviceClient
 
 			while (true)
 			{
-				string messageText = string.Format("Hello from {0} ! {1}", DeviceName, MessageCount);
+				string messageText = $"Hello from {DeviceName} ! {MessageCount}";
 				MessageCount -= 1;
 
 				byte[] messageBytes = UTF8Encoding.UTF8.GetBytes(messageText);
-				Debug.WriteLine(string.Format("{0}-TX {1} byte message {2}", DateTime.UtcNow.ToString("HH:mm:ss"), messageBytes.Length, messageText));
+				Debug.WriteLine($"{DateTime.UtcNow:hh:mm:ss}-TX {messageBytes.Length} byte message {messageText}");
 #if ADDRESSED_MESSAGES_PAYLOAD
 				rfm9XDevice.Send(UTF8Encoding.UTF8.GetBytes(HostName), messageBytes);
 #else
@@ -131,9 +131,9 @@ namespace devMobile.IoT.Rfm9x.LoRaDeviceClient
 #if ADDRESSED_MESSAGES_PAYLOAD
 				string addressText = UTF8Encoding.UTF8.GetString(e.Address, 0, e.Address.Length);
 
-				Debug.WriteLine(string.Format(@"{0}-RX From {1} PacketSnr {2} Packet RSSI {3}dBm RSSI {4}dBm ={5} ""{6}""", DateTime.UtcNow.ToString("HH:mm:ss"), addressText, e.PacketSnr, e.PacketRssi, e.Rssi, e.Data.Length, messageText));
+				Debug.WriteLine($"{DateTime.UtcNow:hh:mm:ss}-RX From {addressText} PacketSnr {e.PacketSnr:F2} Packet RSSI {e.PacketRssi} dBm RSSI {e.Rssi} dBm = {e.Data.Length} byte message {messageText}");
 #else
-				Debug.WriteLine(string.Format(@"{0}-RX PacketSnr {1} Packet RSSI {2}dBm RSSI {3}dBm ={4} ""{5}""", DateTime.UtcNow.ToString("HH:mm:ss"), e.PacketSnr, e.PacketRssi, e.Rssi, e.Data.Length, messageText));
+            Debug.WriteLine($"{DateTime.UtcNow:hh:mm:ss}-RX PacketSnr {e.PacketSnr:F2} Packet RSSI {e.PacketRssi} dBm RSSI {e.Rssi} dBm = {e.Data.Length} byte message {messageText}");
 #endif
 			}
 			catch (Exception ex)
@@ -144,7 +144,7 @@ namespace devMobile.IoT.Rfm9x.LoRaDeviceClient
 
 		private static void Rfm9XDevice_OnTransmit(object sender, Rfm9XDevice.OnDataTransmitedEventArgs e)
 		{
-			Debug.WriteLine(string.Format("{0}-TX Done", DateTime.UtcNow.ToString("HH:mm:ss")));
+			Debug.WriteLine($"{DateTime.UtcNow:hh:mm:ss}-TX Done");
 		}
 
 #if ST_STM32F429I_DISCOVERY || NETDUINO3_WIFI
