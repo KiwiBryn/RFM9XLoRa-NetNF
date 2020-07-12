@@ -15,9 +15,15 @@
 //
 //---------------------------------------------------------------------------------
 //#define ESP32_WROOM_32_LORA_1_CHANNEL   //nanoff --target ESP32_WROOM_32 --serialport COM4 --update
-#define NETDUINO3_WIFI   // nanoff --target NETDUINO3_WIFI --update
+//#define NETDUINO3_WIFI   // nanoff --target NETDUINO3_WIFI --update
 //NOTE May 2020 MBN_QUAIL device doesn't work something broken in SPI configuration
-//#define MBN_QUAIL // nanoff --target MBN_QUAIL --update
+#define MBN_QUAIL // nanoff --target MBN_QUAIL --update
+#if MBN_QUAIL
+   #define MBN_QUAIL_SOCKET1
+   //#define MBN_QUAIL_SOCKET2
+   //#define MBN_QUAIL_SOCKET3
+   //#define MBN_QUAIL_SOCKET4
+#endif
 //NOTE May 2020 ST_NUCLEO64_F091RC device doesn't work something broken in SPI configuration
 //#define ST_NUCLEO64_F091RC // nanoff --target ST_NUCLEO64_F091RC --update
 //NOTE May 2020 ST_NUCLEO144_F746ZG device doesn't work something broken in SPI configuration without jumpers
@@ -48,7 +54,12 @@ namespace devMobile.IoT.Rfm9x.ShieldSPI
       private const string SpiBusId = "SPI2";
 #endif
 #if MBN_QUAIL
+#if MBN_QUAIL_SOCKET1 || MBN_QUAIL_SOCKET2
       private const string SpiBusId = "SPI1";
+#endif
+#if MBN_QUAIL_SOCKET3 || MBN_QUAIL_SOCKET4
+      private const string SpiBusId = "SPI3";
+#endif
 #endif
 #if ST_NUCLEO64_F091RC
       private const string SpiBusId = "SPI1";
@@ -78,14 +89,33 @@ namespace devMobile.IoT.Rfm9x.ShieldSPI
 #endif
 #if MBN_QUAIL
          int ledPinNumber  = PinNumber('E', 15);
+#if MBN_QUAIL_SOCKET1
          // CS on socket 1
          int chipSelectPinNumber = PinNumber('A', 3);
-         // CS on socket 2
-         //int chipSelectPinNumber = PinNumber('E', 0);
          // RST on socket 1
          int resetPinNumber = PinNumber('A', 2);
+#endif
+#if MBN_QUAIL_SOCKET2
+         // CS on socket 2
+         int chipSelectPinNumber = PinNumber('E', 0);
+
          // RST on socket 2
-         //int resetPinNumber = PinNumber('E', 1);
+         int resetPinNumber = PinNumber('E', 1);
+#endif
+#if MBN_QUAIL_SOCKET3
+         // CS on socket 3
+         int chipSelectPinNumber = PinNumber('D', 11);
+
+         // RST on socket 3
+         int resetPinNumber = PinNumber('D', 12);
+#endif
+#if MBN_QUAIL_SOCKET4
+         // CS on socket 4
+         int chipSelectPinNumber = PinNumber('D', 1);
+
+         // RST on socket 4
+         int resetPinNumber = PinNumber('D', 0);
+#endif
 #endif
 #if ST_NUCLEO64_F091RC // No LED for this device as driven by D13 the SPI CLK line
          // Arduino D10->PB6
@@ -119,7 +149,7 @@ namespace devMobile.IoT.Rfm9x.ShieldSPI
          {
             GpioController gpioController = GpioController.GetDefault();
 
-#if NETDUINO3_WIFI|| MBN_QUAIL || ST_NUCLEO64_F091RC || ST_NUCLEO144_F746ZG || ST_STM32F769I_DISCOVERY
+#if NETDUINO3_WIFI || MBN_QUAIL || ST_NUCLEO64_F091RC || ST_NUCLEO144_F746ZG || ST_STM32F769I_DISCOVERY
             // Setup the reset pin
             GpioPin resetGpioPin = gpioController.OpenPin(resetPinNumber);
             resetGpioPin.SetDriveMode(GpioPinDriveMode.Output);
@@ -158,9 +188,9 @@ namespace devMobile.IoT.Rfm9x.ShieldSPI
 
                   Debug.WriteLine(String.Format("Register 0x{0:x2} - Value 0X{1:x2}", RegVersion, readBuffer[1]));
 
-                  #if ESP32_WROOM_32_LORA_1_CHANNEL || MBN_QUAIL || NETDUINO3_WIFI || ST_NUCLEO144_F746ZG || ST_STM32F429I_DISCOVERY || ST_STM32F769I_DISCOVERY
-                     led.Toggle();
-                  #endif
+#if ESP32_WROOM_32_LORA_1_CHANNEL || MBN_QUAIL || NETDUINO3_WIFI || ST_NUCLEO144_F746ZG || ST_STM32F429I_DISCOVERY || ST_STM32F769I_DISCOVERY
+                  led.Toggle();
+#endif
                   Thread.Sleep(10000);
                }
             }           
@@ -171,7 +201,7 @@ namespace devMobile.IoT.Rfm9x.ShieldSPI
          }
       }
 
-#if  NETDUINO3_WIFI || MBN_QUAIL || ST_NUCLEO64_F091RC || ST_NUCLEO144_F746ZG || ST_STM32F429I_DISCOVERY || ST_STM32F769I_DISCOVERY
+#if NETDUINO3_WIFI || MBN_QUAIL || ST_NUCLEO64_F091RC || ST_NUCLEO144_F746ZG || ST_STM32F429I_DISCOVERY || ST_STM32F769I_DISCOVERY
       static int PinNumber(char port, byte pin)
       {
          if (port < 'A' || port > 'J')
