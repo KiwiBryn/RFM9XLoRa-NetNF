@@ -15,9 +15,9 @@
 //
 //---------------------------------------------------------------------------------
 //#define ESP32_WROOM_32_LORA_1_CHANNEL   //nanoff --target ESP32_WROOM_32 --serialport COM4 --update
-//#define NETDUINO3_WIFI   // nanoff --target NETDUINO3_WIFI --update
+#define NETDUINO3_WIFI   // nanoff --target NETDUINO3_WIFI --update
 //NOTE May 2020 MBN_QUAIL device doesn't work something broken in SPI configuration
-#define MBN_QUAIL // nanoff --target MBN_QUAIL --update
+//#define MBN_QUAIL // nanoff --target MBN_QUAIL --update
 #if MBN_QUAIL
    #define MBN_QUAIL_SOCKET1
    //#define MBN_QUAIL_SOCKET2
