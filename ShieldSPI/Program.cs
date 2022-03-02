@@ -37,8 +37,8 @@ namespace devMobile.IoT.Rfm9x.ShieldSPI
    using System.Diagnostics;
    using System.Threading;
 
-   using Windows.Devices.Gpio;
-   using Windows.Devices.Spi;
+   using System.Device.Gpio;
+   using System.Device.Spi;
 
 #if ESP32_WROOM_32_LORA_1_CHANNEL
    using nanoFramework.Hardware.Esp32;
@@ -51,7 +51,7 @@ namespace devMobile.IoT.Rfm9x.ShieldSPI
       private const string SpiBusId = "SPI1";
 #endif
 #if NETDUINO3_WIFI
-      private const string SpiBusId = "SPI2";
+      private const int SpiBusId = 2;
 #endif
 #if MBN_QUAIL
 #if MBN_QUAIL_SOCKET1 || MBN_QUAIL_SOCKET2
@@ -76,6 +76,8 @@ namespace devMobile.IoT.Rfm9x.ShieldSPI
 
       public static void Main()
       {
+         GpioController gpioController = new GpioController();
+
 #if ESP32_WROOM_32_LORA_1_CHANNEL // No reset line for this device as it isn't connected on SX127X
          int ledPinNumber = Gpio.IO17;
          int chipSelectPinNumber = Gpio.IO16;
@@ -143,23 +145,19 @@ namespace devMobile.IoT.Rfm9x.ShieldSPI
 #endif
          Debug.WriteLine("devMobile.IoT.Rfm9x.ShieldSPI starting");
 
-         Debug.WriteLine(Windows.Devices.Spi.SpiDevice.GetDeviceSelector());
-
          try
          {
-            GpioController gpioController = GpioController.GetDefault();
-
 #if NETDUINO3_WIFI || MBN_QUAIL || ST_NUCLEO64_F091RC || ST_NUCLEO144_F746ZG || ST_STM32F769I_DISCOVERY
             // Setup the reset pin
             GpioPin resetGpioPin = gpioController.OpenPin(resetPinNumber);
-            resetGpioPin.SetDriveMode(GpioPinDriveMode.Output);
-            resetGpioPin.Write(GpioPinValue.High);
+            resetGpioPin.SetPinMode(PinMode.Output);
+            resetGpioPin.Write(PinValue.High);
 #endif
 
 #if ESP32_WROOM_32_LORA_1_CHANNEL || MBN_QUAIL || NETDUINO3_WIFI || ST_NUCLEO144_F746ZG || ST_STM32F429I_DISCOVERY || ST_STM32F769I_DISCOVERY
             // Setup the onboard LED
             GpioPin led = gpioController.OpenPin(ledPinNumber);
-            led.SetDriveMode(GpioPinDriveMode.Output);
+            led.SetPinMode(PinMode.Output);
 #endif
 
 #if ESP32_WROOM_32_LORA_1_CHANNEL
@@ -168,14 +166,14 @@ namespace devMobile.IoT.Rfm9x.ShieldSPI
             Configuration.SetPinFunction(nanoFramework.Hardware.Esp32.Gpio.IO14, DeviceFunction.SPI1_CLOCK);
 #endif
 
-            var settings = new SpiConnectionSettings(chipSelectPinNumber)
+            var settings = new SpiConnectionSettings(SpiBusId, chipSelectPinNumber)
             {
                ClockFrequency = 500000,
                Mode = SpiMode.Mode0,// From SemTech docs pg 80 CPOL=0, CPHA=0
                SharingMode = SpiSharingMode.Shared,
             };
 
-            using (SpiDevice device = SpiDevice.FromId(SpiBusId, settings))
+            using (SpiDevice device = SpiDevice.Create(settings))
             {
                Thread.Sleep(500);
 
