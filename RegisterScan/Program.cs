@@ -24,7 +24,7 @@ namespace devMobile.IoT.Rfm9x.RegisterScan
    using System.Diagnostics;
    using System.Threading;
 
-   using Windows.Devices.Spi;
+   using System.Device.Spi;
 
 #if ESP32_WROOM_32_LORA_1_CHANNEL
    using nanoFramework.Hardware.Esp32;
@@ -34,17 +34,17 @@ namespace devMobile.IoT.Rfm9x.RegisterScan
    {
       private readonly SpiDevice rfm9XLoraModem;
 
-      public Rfm9XDevice(string SpiPort, int chipSelectPin)
+      public Rfm9XDevice(int spiPort, int chipSelectPin)
       {
 
-         var settings = new SpiConnectionSettings(chipSelectPin)
+         var settings = new SpiConnectionSettings(spiPort, chipSelectPin)
          {
             ClockFrequency = 500000,
             Mode = SpiMode.Mode0,// From SemTech docs pg 80 CPOL=0, CPHA=0
             SharingMode = SpiSharingMode.Shared
          };
 
-         rfm9XLoraModem = SpiDevice.FromId(SpiPort, settings);
+         rfm9XLoraModem = new SpiDevice(settings);
       }
 
       public Byte RegisterReadByte(byte registerAddress)
@@ -67,7 +67,7 @@ namespace devMobile.IoT.Rfm9x.RegisterScan
       private const string SpiBusId = "SPI1";
 #endif
 #if NETDUINO3_WIFI
-      private const string SpiBusId = "SPI2";
+      private const int SpiBusId = 2;
 #endif
 #if ST_NUCLEO144_F746ZG
       private const string SpiBusId = "SPI1";
