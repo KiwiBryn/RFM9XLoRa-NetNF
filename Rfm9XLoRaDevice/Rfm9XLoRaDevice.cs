@@ -1,5 +1,5 @@
 ﻿//---------------------------------------------------------------------------------
-// Copyright (c) March/April 20s0, devMobile Software
+// Copyright (c) March/April 2010, March 2022 devMobile Software
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ namespace devMobile.IoT.Rfm9x
 	using System.Diagnostics;
 	using System.Threading;
 
-	using Windows.Devices.Gpio;
+	using System.Device.Gpio;
 
 	using nanoFramework.Runtime.Events;
 
@@ -376,9 +376,9 @@ namespace devMobile.IoT.Rfm9x
 		private byte[] DeviceAddress = null;
 #endif
 
-		public Rfm9XDevice(string spiPortName, int chipSelectPin, int resetPinNumber, int interruptPinNumber)
+		public Rfm9XDevice(int spiBusId, int chipSelectPin, int resetPinNumber, int interruptPinNumber)
 		{
-			RegisterManager = new RegisterManager(spiPortName, chipSelectPin);
+			RegisterManager = new RegisterManager(spiBusId, chipSelectPin);
 
 			// Check that SX127X chip is present
 			Byte regVersionValue = RegisterManager.ReadByte((byte)Registers.RegVersion);
@@ -387,23 +387,23 @@ namespace devMobile.IoT.Rfm9x
 				throw new ApplicationException("Semtech SX127X not found");
 			}
 
-			GpioController gpioController = GpioController.GetDefault();
+			GpioController gpioController = new GpioController();
 
 			// Setup the reset pin
 			ResetGpioPin = gpioController.OpenPin(resetPinNumber);
-			ResetGpioPin.SetDriveMode(GpioPinDriveMode.Output);
-			ResetGpioPin.Write(GpioPinValue.High);
+			ResetGpioPin.SetPinMode(PinMode.Output);
+			ResetGpioPin.Write(PinValue.High);
 
 			// Interrupt pin for RX message, TX done etc. notifications
 			InterruptGpioPin = gpioController.OpenPin(interruptPinNumber);
-			InterruptGpioPin.SetDriveMode(GpioPinDriveMode.Input);
+			InterruptGpioPin.SetPinMode(PinMode.Input);
 
 			InterruptGpioPin.ValueChanged += InterruptGpioPin_ValueChanged;
 		}
 
-		public Rfm9XDevice(string spiPortName, int chipSelectPin, int interruptPinNumber)
+		public Rfm9XDevice(int spiBusId, int chipSelectPin, int interruptPinNumber)
 		{
-			RegisterManager = new RegisterManager(spiPortName, chipSelectPin);
+			RegisterManager = new RegisterManager(spiBusId, chipSelectPin);
 
 			// Check that SX127X chip is present
 			Byte regVersionValue = RegisterManager.ReadByte((byte)Registers.RegVersion);
@@ -413,9 +413,9 @@ namespace devMobile.IoT.Rfm9x
 			}
 
 			// Interrupt pin for RX message, TX done etc. notifications
-			GpioController gpioController = GpioController.GetDefault();
+			GpioController gpioController = new GpioController();
 			InterruptGpioPin = gpioController.OpenPin(interruptPinNumber);
-			InterruptGpioPin.SetDriveMode(GpioPinDriveMode.Input);
+			InterruptGpioPin.SetPinMode(PinMode.Input);
 
 			InterruptGpioPin.ValueChanged += InterruptGpioPin_ValueChanged;
 		}
@@ -470,9 +470,9 @@ namespace devMobile.IoT.Rfm9x
 			// Strobe Reset pin briefly to factory reset SX127X chip
 			if (ResetGpioPin != null)
 			{
-				ResetGpioPin.Write(GpioPinValue.Low);
+				ResetGpioPin.Write(PinValue.Low);
 				Thread.Sleep(10);
-				ResetGpioPin.Write(GpioPinValue.High);
+				ResetGpioPin.Write(PinValue.High);
 				Thread.Sleep(10);
 			}
 			// Put the device into sleep mode so registers can be changed
@@ -759,9 +759,9 @@ namespace devMobile.IoT.Rfm9x
 			OnReceive?.Invoke(this, receiveArgs);
 		}
 
-		private void InterruptGpioPin_ValueChanged(object sender, GpioPinValueChangedEventArgs e)
+		private void InterruptGpioPin_ValueChanged(object sender, PinValueChangedEventArgs e)
 		{
-			if (e.Edge != GpioPinEdge.RisingEdge)
+			if (e.ChangeType != PinEventTypes.Rising)
 			{
 				return;
 			}

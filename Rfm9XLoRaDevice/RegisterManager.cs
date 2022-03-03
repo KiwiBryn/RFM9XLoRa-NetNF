@@ -1,5 +1,5 @@
 ﻿//---------------------------------------------------------------------------------
-// Copyright (c) March/April 2020, devMobile Software
+// Copyright (c) March/April 2020, March 2022 devMobile Software
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ namespace devMobile.IoT.Rfm9x
 	using System;
 	using System.Diagnostics;
 
-	using Windows.Devices.Spi;
+	using System.Device.Spi;
 
 	public sealed class RegisterManager
 	{
@@ -27,16 +27,16 @@ namespace devMobile.IoT.Rfm9x
 		private const byte RegisterAddressReadMask = 0X7f;
 		private const byte RegisterAddressWriteMask = 0x80;
 
-		public RegisterManager(string spiPortName, int chipSelectPin, int clockFrequency = 500000)
+		public RegisterManager(int spiBusId, int chipSelectPin, int clockFrequency = 500000)
 		{
-			var settings = new SpiConnectionSettings(chipSelectPin)
+			var settings = new SpiConnectionSettings(spiBusId, chipSelectPin)
 			{
 				Mode = SpiMode.Mode0,
 				ClockFrequency = clockFrequency,
 				SharingMode = SpiSharingMode.Shared,
 			};
 
-			rfm9XLoraModem = SpiDevice.FromId(spiPortName, settings);
+			rfm9XLoraModem = new SpiDevice(settings);
 		}
 
 		public Byte ReadByte(byte registerAddress)
