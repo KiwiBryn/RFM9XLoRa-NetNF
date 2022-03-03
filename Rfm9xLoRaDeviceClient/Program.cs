@@ -1,5 +1,5 @@
 ﻿//---------------------------------------------------------------------------------
-// Copyright (c) April/May 2020, devMobile Software
+// Copyright (c) April/May 2020, March 2022 devMobile Software
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
 //
 //---------------------------------------------------------------------------------
 #define ADDRESSED_MESSAGES_PAYLOAD
-#define ESP32_WROOM_32_LORA_1_CHANNEL   //nanoff --target ESP32_WROOM_32 --serialport COM4 --update
-//#define NETDUINO3_WIFI   // nanoff --target NETDUINO3_WIFI --update
+//#define ESP32_WROOM_32_LORA_1_CHANNEL   //nanoff --target ESP32_WROOM_32 --serialport COM4 --update
+#define NETDUINO3_WIFI   // nanoff --target NETDUINO3_WIFI --update
 //#define ST_STM32F429I_DISCOVERY       //nanoff --target ST_STM32F429I_DISCOVERY --update
 namespace devMobile.IoT.Rfm9x.LoRaDeviceClient
 {
@@ -44,7 +44,7 @@ namespace devMobile.IoT.Rfm9x.LoRaDeviceClient
 #endif
 #if NETDUINO3_WIFI
 		private const string DeviceName = "N3W";
-		private const string SpiBusId = "SPI2";
+		private const int SpiBusId = 2;
 #endif
 #if ADDRESSED_MESSAGES_PAYLOAD
 		private const string HostName = "LoRaIoT1";
