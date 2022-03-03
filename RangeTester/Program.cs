@@ -1,5 +1,5 @@
 ﻿//---------------------------------------------------------------------------------
-// Copyright (c) May 2020, devMobile Software
+// Copyright (c) May 2020, March 2022 devMobile Software
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ namespace devMobile.IoT.Rfm9x.RangeTester
 #if ESP32_WROOM_32_LORA_1_CHANNEL
 	using nanoFramework.Hardware.Esp32;
 #endif
-	using Windows.Devices.Gpio;
+	using System.Device.Gpio;
 
 	using devMobile.IoT.Rfm9x;
 
@@ -47,10 +47,12 @@ namespace devMobile.IoT.Rfm9x.RangeTester
 #if NETDUINO3_WIFI
 		private const string DeviceName = "N3WA";
 		//private const string DeviceName = "N3WB";
-		private const string SpiBusId = "SPI2";
+		private const int SpiBusId = 2;
 #endif
 #if ADDRESSED_MESSAGES_PAYLOAD
-		private const string HostName = "LoRaIoT1";
+		//private const string HostName = "LoRaIoT1";
+		//private const string HostName = "N3WA";
+		private const string HostName = "N3WB";
 #endif
 
 		static void Main()
@@ -84,11 +86,11 @@ namespace devMobile.IoT.Rfm9x.RangeTester
 #endif
 			Debug.WriteLine("devMobile.IoT.Rfm9x.LoRaDeviceClient starting");
 
-			GpioController gpioController = GpioController.GetDefault();
+			GpioController gpioController = new GpioController();
 
 			led = gpioController.OpenPin(ledPinNumber);
-			led.SetDriveMode(GpioPinDriveMode.Output);
-			led.Write(GpioPinValue.Low);
+			led.SetPinMode(PinMode.Output);
+			led.Write(PinValue.Low);
 
 #if ST_STM32F429I_DISCOVERY || NETDUINO3_WIFI
 			Rfm9XDevice rfm9XDevice = new Rfm9XDevice(SpiBusId, chipSelectPinNumber, resetPinNumber, interruptPinNumber);
