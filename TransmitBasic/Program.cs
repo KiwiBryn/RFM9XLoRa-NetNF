@@ -1,5 +1,5 @@
 ﻿//---------------------------------------------------------------------------------
-// Copyright (c) April 2020, devMobile Software
+// Copyright (c) April 2020, March 2022 devMobile Software
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,8 +24,8 @@ namespace devMobile.IoT.Rfm9x.TransmitBasic
    using System.Text;
    using System.Threading;
 
-   using Windows.Devices.Gpio;
-   using Windows.Devices.Spi;
+   using System.Device.Gpio;
+   using System.Device.Spi;
 
 #if ESP32_WROOM_32_LORA_1_CHANNEL
    using nanoFramework.Hardware.Esp32;
@@ -37,38 +37,38 @@ namespace devMobile.IoT.Rfm9x.TransmitBasic
       private const byte RegisterAddressReadMask = 0X7f;
       private const byte RegisterAddressWriteMask = 0x80;
 
-      public Rfm9XDevice(string spiPort, int chipSelectPin, int resetPin)
+      public Rfm9XDevice(int busId, int chipSelectPin, int resetPin)
       {
-         var settings = new SpiConnectionSettings(chipSelectPin)
+         var settings = new SpiConnectionSettings(busId, chipSelectPin)
          {
-            ClockFrequency = 1000000,
+            ClockFrequency = 500000,
             //DataBitLength = 8,
             Mode = SpiMode.Mode0,// From SemTech docs pg 80 CPOL=0, CPHA=0
             SharingMode = SpiSharingMode.Shared,
          };
 
-         rfm9XLoraModem = SpiDevice.FromId(spiPort, settings);
+         rfm9XLoraModem = new SpiDevice(settings);
 
          // Factory reset pin configuration
-         GpioController gpioController = GpioController.GetDefault();
+         GpioController gpioController = new GpioController();
          GpioPin resetGpioPin = gpioController.OpenPin(resetPin);
-         resetGpioPin.SetDriveMode(GpioPinDriveMode.Output);
-         resetGpioPin.Write(GpioPinValue.Low);
+         resetGpioPin.SetPinMode(PinMode.Output);
+         resetGpioPin.Write(PinValue.Low);
          Thread.Sleep(10);
-         resetGpioPin.Write(GpioPinValue.High);
+         resetGpioPin.Write(PinValue.High);
          Thread.Sleep(10);
       }
 
-      public Rfm9XDevice(string spiPort, int chipSelectPin)
+      public Rfm9XDevice(int busId, int chipSelectPin)
       {
-         var settings = new SpiConnectionSettings(chipSelectPin)
+         var settings = new SpiConnectionSettings(busId, chipSelectPin)
          {
-            ClockFrequency = 1000000,
+            ClockFrequency = 500000,
             Mode = SpiMode.Mode0,// From SemTech docs pg 80 CPOL=0, CPHA=0
             SharingMode = SpiSharingMode.Shared,
          };
 
-         rfm9XLoraModem = SpiDevice.FromId(spiPort, settings);
+         rfm9XLoraModem = new SpiDevice(settings);
       }
 
       public Byte RegisterReadByte(byte registerAddress)
@@ -155,7 +155,7 @@ namespace devMobile.IoT.Rfm9x.TransmitBasic
       private const string SpiBusId = "SPI1";
 #endif
 #if NETDUINO3_WIFI
-      private const string SpiBusId = "SPI2";
+      private const int SpiBusId = 2;
 #endif
 
       static void Main()
@@ -223,7 +223,7 @@ namespace devMobile.IoT.Rfm9x.TransmitBasic
                byte IrqFlags = rfm9XDevice.RegisterReadByte(0x12); // RegIrqFlags
                while ((IrqFlags & 0b00001000) == 0)  // wait until TxDone cleared
                {
-                  Thread.Sleep(10);
+                  Thread.Sleep(100);
                   IrqFlags = rfm9XDevice.RegisterReadByte(0x12); // RegIrqFlags
                   Debug.Write(".");
                }
