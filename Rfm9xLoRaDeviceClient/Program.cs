@@ -14,7 +14,7 @@
 // limitations under the License.
 //
 //---------------------------------------------------------------------------------
-//#define ADDRESSED_MESSAGES_PAYLOAD
+#define ADDRESSED_MESSAGES_PAYLOAD
 #define ESP32_WROOM_32_LORA_1_CHANNEL   //nanoff --target ESP32_WROOM_32 --serialport COM4 --update
 //#define NETDUINO3_WIFI   // nanoff --target NETDUINO3_WIFI --update
 //#define ST_STM32F429I_DISCOVERY       //nanoff --target ST_STM32F429I_DISCOVERY --update

@@ -15,8 +15,8 @@
 // 
 //---------------------------------------------------------------------------------
 //#define ST_STM32F429I_DISCOVERY       //nanoff --target ST_STM32F429I_DISCOVERY --update
-#define ESP32_WROOM_32_LORA_1_CHANNEL   //nanoff --target ESP32_WROOM_32 --serialport COM4 --update
-//#define NETDUINO3_WIFI   // nanoff --target NETDUINO3_WIFI --update
+//#define ESP32_WROOM_32_LORA_1_CHANNEL   //nanoff --target ESP32_WROOM_32 --serialport COM4 --update
+#define NETDUINO3_WIFI   // nanoff --target NETDUINO3_WIFI --update
 namespace devMobile.IoT.Rfm9x.ReceiveTransmitInterrupt
 {
    using System;
@@ -24,8 +24,8 @@ namespace devMobile.IoT.Rfm9x.ReceiveTransmitInterrupt
    using System.Text;
    using System.Threading;
 
-   using Windows.Devices.Gpio;
-   using Windows.Devices.Spi;
+   using System.Device.Gpio;
+   using System.Device.Spi;
 
 #if ESP32_WROOM_32_LORA_1_CHANNEL
    using nanoFramework.Hardware.Esp32;
@@ -38,9 +38,9 @@ namespace devMobile.IoT.Rfm9x.ReceiveTransmitInterrupt
       private const byte RegisterAddressReadMask = 0X7f;
       private const byte RegisterAddressWriteMask = 0x80;
 
-      public Rfm9XDevice(string spiPort, int chipSelectPin, int resetPin, int interruptPin)
+      public Rfm9XDevice(int spiBusId, int chipSelectPin, int resetPin, int interruptPin)
       {
-         var settings = new SpiConnectionSettings(chipSelectPin)
+         var settings = new SpiConnectionSettings(spiBusId, chipSelectPin)
          {
             ClockFrequency = 500000,
             //DataBitLength = 8,
@@ -48,25 +48,25 @@ namespace devMobile.IoT.Rfm9x.ReceiveTransmitInterrupt
             SharingMode = SpiSharingMode.Shared,
          };
 
-         rfm9XLoraModem = SpiDevice.FromId(spiPort, settings);
+         rfm9XLoraModem = new SpiDevice(settings);
 
          // Factory reset pin configuration
-         GpioController gpioController = GpioController.GetDefault();
+         GpioController gpioController = new GpioController();
          GpioPin resetGpioPin = gpioController.OpenPin(resetPin);
-         resetGpioPin.SetDriveMode(GpioPinDriveMode.Output);
-         resetGpioPin.Write(GpioPinValue.Low);
+         resetGpioPin.SetPinMode(PinMode.Output);
+         resetGpioPin.Write(PinValue.Low);
          Thread.Sleep(10);
-         resetGpioPin.Write(GpioPinValue.High);
+         resetGpioPin.Write(PinValue.High);
          Thread.Sleep(10);
 
          // Interrupt pin for RX message & TX done notification 
          InterruptGpioPin = gpioController.OpenPin(interruptPin);
-         InterruptGpioPin.SetDriveMode(GpioPinDriveMode.Input);
+         InterruptGpioPin.SetPinMode(PinMode.Input);
 
          InterruptGpioPin.ValueChanged += InterruptGpioPin_ValueChanged;
       }
 
-      public Rfm9XDevice(string spiPort, int chipSelectPin, int interruptPin)
+		public Rfm9XDevice(string spiPort, int chipSelectPin, int interruptPin)
       {
          var settings = new SpiConnectionSettings(chipSelectPin)
          {
@@ -75,19 +75,19 @@ namespace devMobile.IoT.Rfm9x.ReceiveTransmitInterrupt
             SharingMode = SpiSharingMode.Shared,
          };
 
-         rfm9XLoraModem = SpiDevice.FromId(spiPort, settings);
+         rfm9XLoraModem = new SpiDevice(settings);
 
          // Interrupt pin for RX message & TX done notification 
-         GpioController gpioController = GpioController.GetDefault();
+         GpioController gpioController = new GpioController();
          InterruptGpioPin = gpioController.OpenPin(interruptPin);
-         InterruptGpioPin.SetDriveMode(GpioPinDriveMode.Input);
+         InterruptGpioPin.SetPinMode(PinMode.Input);
 
          InterruptGpioPin.ValueChanged += InterruptGpioPin_ValueChanged;
       }
 
-      private void InterruptGpioPin_ValueChanged(object sender, GpioPinValueChangedEventArgs e)
+      private void InterruptGpioPin_ValueChanged(object sender, PinValueChangedEventArgs e)
       {
-         if (e.Edge != GpioPinEdge.RisingEdge)
+         if (e.ChangeType != PinEventTypes.Rising)
          {
             return;
          }
@@ -213,7 +213,7 @@ namespace devMobile.IoT.Rfm9x.ReceiveTransmitInterrupt
       private const string SpiBusId = "SPI1";
 #endif
 #if NETDUINO3_WIFI
-      private const string SpiBusId = "SPI2";
+      private const int SpiBusId = 2;
 #endif
 
       static void Main()

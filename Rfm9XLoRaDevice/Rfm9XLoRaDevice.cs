@@ -14,7 +14,7 @@
 // limitations under the License.
 //
 //---------------------------------------------------------------------------------
-//#define ADDRESSED_MESSAGES_PAYLOAD
+#define ADDRESSED_MESSAGES_PAYLOAD
 namespace devMobile.IoT.Rfm9x
 {
    using System;
