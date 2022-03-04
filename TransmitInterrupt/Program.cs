@@ -34,7 +34,7 @@ namespace devMobile.IoT.Rfm9x.TransmitInterrupt
    public sealed class Rfm9XDevice
    {
       private readonly SpiDevice rfm9XLoraModem;
-      private readonly GpioPin InterruptGpioPin = null;
+      private readonly GpioController gpioController;
       private const byte RegisterAddressReadMask = 0X7f;
       private const byte RegisterAddressWriteMask = 0x80;
 
@@ -50,8 +50,9 @@ namespace devMobile.IoT.Rfm9x.TransmitInterrupt
 
          rfm9XLoraModem = new SpiDevice(settings);
 
+         gpioController = new GpioController();
+
          // Factory reset pin configuration
-         GpioController gpioController = new GpioController();
          GpioPin resetGpioPin = gpioController.OpenPin(resetPin);
          resetGpioPin.SetPinMode(PinMode.Output);
          resetGpioPin.Write(PinValue.Low);
@@ -60,10 +61,9 @@ namespace devMobile.IoT.Rfm9x.TransmitInterrupt
          Thread.Sleep(10);
 
          // Interrupt pin for RX message & TX done notification 
-         InterruptGpioPin = gpioController.OpenPin(interruptPin);
-         InterruptGpioPin.SetPinMode(PinMode.Input);
+         gpioController.OpenPin(interruptPin, PinMode.InputPullDown);
 
-         InterruptGpioPin.ValueChanged += InterruptGpioPin_ValueChanged;
+         gpioController.RegisterCallbackForPinValueChangedEvent(interruptPin, PinEventTypes.Rising, InterruptGpioPin_ValueChanged);
       }
 
 
@@ -78,21 +78,16 @@ namespace devMobile.IoT.Rfm9x.TransmitInterrupt
 
          rfm9XLoraModem = new SpiDevice(settings);
 
-         // Interrupt pin for RX message & TX done notification 
-         GpioController gpioController = new GpioController();
-         InterruptGpioPin = gpioController.OpenPin(interruptPin);
-         InterruptGpioPin.SetPinMode(PinMode.Input);
+         gpioController = new GpioController();
 
-         InterruptGpioPin.ValueChanged += InterruptGpioPin_ValueChanged;
+         // Interrupt pin for RX message & TX done notification 
+         gpioController.OpenPin(interruptPin, PinMode.InputPullDown);
+
+         gpioController.RegisterCallbackForPinValueChangedEvent(interruptPin, PinEventTypes.Rising, InterruptGpioPin_ValueChanged);
       }
 
       private void InterruptGpioPin_ValueChanged(object sender, PinValueChangedEventArgs e)
       {
-         if (e.ChangeType != PinEventTypes.Rising)
-         {
-            return;
-         }
-
          byte irqFlags = this.RegisterReadByte(0x12); // RegIrqFlags
          Debug.WriteLine($"RegIrqFlags 0X{irqFlags:x2}");
 
@@ -205,7 +200,7 @@ namespace devMobile.IoT.Rfm9x.TransmitInterrupt
 #if NETDUINO3_WIFI
          int chipSelectPinNumber = PinNumber('B', 10);
          int resetPinNumber = PinNumber('E', 5);
-         int interruptPinNumber = PinNumber('A', 4);
+         int interruptPinNumber = PinNumber('A', 3);
 #endif
 
          try
