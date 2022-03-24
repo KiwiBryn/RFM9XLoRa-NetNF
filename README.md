@@ -1,4 +1,7 @@
-# RFM9XLoRa-NetNF
+# RFM9XLoRa-NetNF 
+
+# This library has been superceeded by [SX127X-NetNF](https://github.com/KiwiBryn/SX127X-NetNF)
+
 A C# library for [LoRa](https://lora-alliance.org/) connectivity for Semtech [SX127X](https://www.semtech.com/products/wireless-rf/lora-transceivers/SX1276)/HopeRF [RFM9X](http://www.hoperf.com/rf_transceiver/lora/RFM95W.html) equipped [.NET nanoFramework](https://github.com/nanoFramework) powered devices.
 
 The repo has the source code for the series of blog posts written as I built this library
